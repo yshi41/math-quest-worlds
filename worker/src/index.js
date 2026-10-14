@@ -1,4 +1,4 @@
-/* Times Table Worlds save service. One row per kid; a save only lands when it names the revision it was
+/* Math Quest Worlds save service. One row per kid; a save only lands when it names the revision it was
    based on, saves from two devices are merged here, progress can never drop, and every accepted save is
    kept in a history table for recovery. Shares the D1 database with Spelling Worlds, in its own tables. */
 import { mergeState, lowersProgress, KIDS } from './logic.mjs';
@@ -8,9 +8,9 @@ const MAX_BYTES = 200000;
 const KEEP_HISTORY = 300;
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '86400' };
 const SCHEMA = [
-  'CREATE TABLE IF NOT EXISTS tt_saves (player TEXT PRIMARY KEY, rev INTEGER NOT NULL, state TEXT NOT NULL, updated INTEGER NOT NULL)',
-  'CREATE TABLE IF NOT EXISTS tt_history (id INTEGER PRIMARY KEY AUTOINCREMENT, player TEXT NOT NULL, rev INTEGER NOT NULL, state TEXT NOT NULL, at INTEGER NOT NULL)',
-  'CREATE INDEX IF NOT EXISTS tt_history_player ON tt_history (player, id)'
+  'CREATE TABLE IF NOT EXISTS mq_saves (player TEXT PRIMARY KEY, rev INTEGER NOT NULL, state TEXT NOT NULL, updated INTEGER NOT NULL)',
+  'CREATE TABLE IF NOT EXISTS mq_history (id INTEGER PRIMARY KEY AUTOINCREMENT, player TEXT NOT NULL, rev INTEGER NOT NULL, state TEXT NOT NULL, at INTEGER NOT NULL)',
+  'CREATE INDEX IF NOT EXISTS mq_history_player ON mq_history (player, id)'
 ];
 let ready = null;
 
@@ -23,7 +23,7 @@ async function ensure(db) {
   return ready;
 }
 async function current(db, id) {
-  const r = await db.prepare('SELECT rev, state FROM tt_saves WHERE player = ?').bind(id).first();
+  const r = await db.prepare('SELECT rev, state FROM mq_saves WHERE player = ?').bind(id).first();
   return r ? { rev: r.rev, state: JSON.parse(r.state) } : { rev: 0, state: null };
 }
 
@@ -31,10 +31,10 @@ export default {
   async fetch(req, env) {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
     const url = new URL(req.url), db = env.DB;
-    if (url.pathname === '/') return new Response('Times Table Worlds save service', { headers: { ...CORS, 'Content-Type': 'text/plain' } });
+    if (url.pathname === '/') return new Response('Math Quest Worlds save service', { headers: { ...CORS, 'Content-Type': 'text/plain' } });
     await ensure(db);
     if (url.pathname === '/saves' && req.method === 'GET') {
-      const { results } = await db.prepare(`SELECT player, rev, state FROM tt_saves WHERE player IN (${KIDS.map(() => '?').join(', ')})`).bind(...KIDS).all();
+      const { results } = await db.prepare(`SELECT player, rev, state FROM mq_saves WHERE player IN (${KIDS.map(() => '?').join(', ')})`).bind(...KIDS).all();
       const players = {};
       for (const r of results) players[r.player] = { rev: r.rev, state: JSON.parse(r.state) };
       return json({ players });
@@ -64,12 +64,12 @@ export default {
     if (lowersProgress(state, cur.state)) return json({ conflict: true, ...cur });
     const now = Date.now(), s = JSON.stringify(state);
     const res = cur.rev === 0
-      ? await db.prepare('INSERT INTO tt_saves (player, rev, state, updated) VALUES (?, 1, ?, ?) ON CONFLICT(player) DO NOTHING').bind(id, s, now).run()
-      : await db.prepare('UPDATE tt_saves SET rev = rev + 1, state = ?, updated = ? WHERE player = ? AND rev = ?').bind(s, now, id, cur.rev).run();
+      ? await db.prepare('INSERT INTO mq_saves (player, rev, state, updated) VALUES (?, 1, ?, ?) ON CONFLICT(player) DO NOTHING').bind(id, s, now).run()
+      : await db.prepare('UPDATE mq_saves SET rev = rev + 1, state = ?, updated = ? WHERE player = ? AND rev = ?').bind(s, now, id, cur.rev).run();
     if (!res.meta.changes) return json({ conflict: true, ...(await current(db, id)) });
     const next = cur.rev + 1;
-    const writes = [db.prepare('INSERT INTO tt_history (player, rev, state, at) VALUES (?, ?, ?, ?)').bind(id, next, s, now)];
-    if (next % 25 === 0) writes.push(db.prepare('DELETE FROM tt_history WHERE player = ? AND id NOT IN (SELECT id FROM tt_history WHERE player = ? ORDER BY id DESC LIMIT ?)').bind(id, id, KEEP_HISTORY));
+    const writes = [db.prepare('INSERT INTO mq_history (player, rev, state, at) VALUES (?, ?, ?, ?)').bind(id, next, s, now)];
+    if (next % 25 === 0) writes.push(db.prepare('DELETE FROM mq_history WHERE player = ? AND id NOT IN (SELECT id FROM mq_history WHERE player = ? ORDER BY id DESC LIMIT ?)').bind(id, id, KEEP_HISTORY));
     await db.batch(writes);
     return json(merged ? { rev: next, state, merged: true } : { rev: next });
   }

@@ -1,7 +1,7 @@
 /* In-memory stand-in for the save service (worker/src/index.js), so tests never touch the kids'
    real saves. attach(page) points the page at it and blocks every request to the real service. */
 const MOCK = 'https://cloud.test';
-const REAL = /times-table-saves\.[a-z0-9-]+\.workers\.dev/;
+const REAL = /math-quest-saves\.[a-z0-9-]+\.workers\.dev/;
 const clone = o => JSON.parse(JSON.stringify(o));
 let logic = null;
 async function load() { if (!logic) logic = await import('../worker/src/logic.mjs'); return logic; }
@@ -36,7 +36,7 @@ function create() {
   async function attach(page) {
     await page.setRequestInterception(true);
     page.on('request', r => { handle(r).catch(() => { try { r.abort(); } catch (e) {} }); });
-    await page.evaluateOnNewDocument(mock => { window.TT_CLOUD = mock; }, MOCK);
+    await page.evaluateOnNewDocument(mock => { window.MQ_CLOUD = mock; }, MOCK);
   }
   return { store, history, stats, ctl, attach, MOCK };
 }

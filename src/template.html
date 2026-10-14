@@ -1,194 +1,173 @@
-<title>Times Table Worlds</title>
+<title>Math Quest Worlds</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
 <style>
 /*@@SW_CSS@@*/
-/* Times Table Worlds: the Spelling Worlds palettes, scenery and characters above; the games below.
-   Layout: one screen at a time in a 1000px column over the world's scene. The run and the boss battle share one stage
-   (scene, canvas, character); the showdown is a split screen with a pad per kid. */
+/* Math Quest Worlds: the Spelling Worlds palettes, scenery and characters above; the quest below.
+   One screen at a time in a 1000px column over the world's scene. The region plays on a 16:11 stage. */
 body{overflow:auto;min-height:100%}
 #pageScene{z-index:0}
 .wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding-inline:16px;padding-block:14px 28px}
-.h-display,.brand-big,.pc-name,.tbl-n,.eq,.banner,.score,.res-title,.lv-title,.ch-name,.wp-name,.pad-btn,.ans-btn,.duel-name,.duel-score,.side-eq,.duel-title{font-family:var(--display),'Nunito',sans-serif;line-height:1.2}
-.lede{color:var(--ink-soft);font-weight:700;margin:.4em 0 0;max-width:52ch}
+h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-name,.res-title,.ov-title,.bt-name,.pad-val,.mv-btn,.st-tab,.item-name,.mp-name,.hud-chip{font-family:var(--display),'Nunito',sans-serif;line-height:1.2}
+.lede{color:var(--ink-soft);font-weight:700;margin:.4em 0 0;max-width:56ch}
 .brand-big{font-size:clamp(2.2rem,7vw,3.4rem);font-weight:700;color:var(--accent)}
 .who{font-size:1.5rem;margin:20px 0 12px}
-.profile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.profile-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .profile-card{border:3px solid transparent;border-radius:24px;padding:10px 8px 14px;display:grid;justify-items:center;gap:2px;cursor:pointer;color:#22333B;box-shadow:var(--shadow);transition:transform .15s}
 .profile-card:hover:not(:disabled){transform:translateY(-4px) rotate(-1deg)}
 .profile-card:disabled{opacity:.55;cursor:progress}
-.profile-card.on{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent),var(--shadow)}
-.profile-card .axo{width:110px;height:auto}
-.pc-name{font-size:1.5rem;font-weight:700}
+.profile-card .axo{width:100px;height:auto}
+.pc-name{font-size:1.4rem;font-weight:700}
 .pc-meta{display:flex;gap:10px;align-items:center;font-weight:800;font-size:.9rem;opacity:.8;font-variant-numeric:tabular-nums}
 .profile-card .pc-meta svg{width:1.15em;height:1.15em;max-width:none}
-.pc-world{font-size:.75rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+.pc-world{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
 .save-note{color:var(--ink-soft);font-size:.9rem;font-weight:700;margin:14px 0 0}
-@media (max-width:560px){.profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){.profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .ic{width:1.15em;height:1.15em;vertical-align:-.2em}
 .st{width:1.1em;height:1.1em;fill:var(--line);vertical-align:-.15em}
 .st.on{fill:var(--gold-deep)}
-
 /* hub */
 .topbar2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;background:color-mix(in srgb,var(--surface) 82%,transparent);border:2px solid var(--line);border-radius:22px;padding:8px 10px}
 .topbar2 .brand{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.hub-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:14px;margin-bottom:14px;align-items:start}
-.hub-grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;margin-bottom:14px;align-items:start}
-@media (max-width:780px){.hub-grid,.hub-grid2{grid-template-columns:1fr}}
+.hub-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:14px;margin-bottom:14px;align-items:start}
+@media (max-width:780px){.hub-grid{grid-template-columns:1fr}}
 .card h3{font-size:1.25rem;margin-bottom:12px}
 .hero-card{display:grid;justify-items:center;gap:8px;text-align:center}
-.hero-card .axo-box{max-width:220px}
+.hero-wrap{position:relative;width:min(240px,70vw)}
+.hero-wrap .axo-box{max-width:none}
+.hero-wrap .pet-box{position:absolute;right:-18px;bottom:-6px;width:38%}
+.pet{width:100%;height:auto;display:block;overflow:visible}
+.pet-box .pet{animation:bob 2.6s ease-in-out infinite}
 .lv{width:100%;text-align:left}
 .lv-title{font-weight:700;color:var(--accent);font-size:1.1rem}
 .bar{height:12px;border-radius:99px;background:var(--surface-2);border:2px solid var(--line);overflow:hidden;margin:6px 0}
 .bar i{display:block;height:100%;background:var(--accent);border-radius:inherit;transition:width .5s}
 .lv small{color:var(--ink-soft);font-weight:700}
-.tables{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.tbl{border:2px solid var(--line);background:var(--surface-2);border-radius:18px;padding:8px 4px;display:grid;justify-items:center;gap:2px;cursor:pointer;box-shadow:0 4px 0 var(--line);transition:transform .12s}
-.tbl:hover{transform:translateY(-3px)}
-.tbl:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
-.tbl-n{font-size:1.9rem;font-weight:700;color:var(--accent)}
-.tbl-n small{font-size:.55em;margin-left:2px;color:var(--ink-soft)}
-.tbl-best{font-size:.72rem;font-weight:800;color:var(--ink-soft);font-variant-numeric:tabular-nums;text-align:center}
-.mix{width:100%;margin-top:12px;display:grid;gap:2px}
-.mix small{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:800;opacity:.9}
-.chars{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
-.ch{border:2px solid var(--line);background:var(--surface-2);border-radius:18px;padding:8px 6px 10px;display:grid;justify-items:center;gap:4px}
-.ch.on{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
-.ch .axo{width:84px;height:auto}
-.ch-name{font-weight:600;font-size:1rem;text-align:center}
-.ch .btn{font-size:.9rem;padding:6px 14px;box-shadow:0 3px 0 var(--press)}
-.worlds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:16px}
-.wp{border:3px solid transparent;border-radius:16px;padding:10px 4px;cursor:pointer;color:#22333B;font-weight:800;font-size:.85rem}
-.wp.on{border-color:var(--accent)}
-.wp-name{font-weight:600;font-size:.95rem}
-.side-h{font-size:1.05rem;margin:0 0 8px}
+.gear-line{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.gear-chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface-2);border:2px solid var(--line);border-radius:99px;padding:3px 10px;font-weight:800;font-size:.85rem}
+.gear-chip .gi{width:22px;height:22px}
+.big-actions{display:grid;gap:10px}
+.big-actions .btn{display:grid;gap:2px;text-align:left;padding:14px 20px;white-space:normal}
+.big-actions .btn small{font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:800;opacity:.9}
 .toggles{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .tog{border:2px solid var(--line);background:var(--surface-2);border-radius:999px;padding:7px 14px;font-weight:800;cursor:pointer;color:var(--ink-soft)}
 .tog[aria-pressed="true"]{border-color:var(--accent);color:var(--ink)}
 .how ul{margin:0;padding-left:1.1em;display:grid;gap:6px;color:var(--ink-soft);font-weight:700}
 .how b{color:var(--ink)}
-
-/* the run and the boss battle */
-.stage{position:relative;width:100%;height:clamp(300px,calc(100vh - 240px),560px);height:clamp(300px,calc(100dvh - 240px),560px);border-radius:26px;overflow:hidden;box-shadow:0 0 0 3px var(--line),var(--shadow);touch-action:none;user-select:none;-webkit-user-select:none;background:linear-gradient(180deg,var(--bg),var(--bg-deep))}
-.stage .scene{position:absolute;inset:0;z-index:0}
-#cv{position:absolute;inset:0;z-index:2;display:block}
-#heroPos{position:absolute;left:0;bottom:4px;z-index:3;width:clamp(84px,12vw,124px);pointer-events:none;will-change:transform}
-#heroBox.axo-box{max-width:none;width:100%}
-#heroBox.glowing{filter:drop-shadow(0 0 10px #fff) drop-shadow(0 0 18px var(--accent))}
-.axo-box.lunge{animation:lunge .6s cubic-bezier(.3,1.4,.5,1)}
-@keyframes lunge{0%{transform:translateX(0)}35%{transform:translateX(70px) scale(1.08,.95)}100%{transform:translateX(0)}}
-.hud{position:absolute;inset:0 0 auto 0;z-index:4;display:grid;grid-template-columns:1fr auto 1fr;grid-template-areas:"l eq r";align-items:start;gap:8px;padding:10px 12px;pointer-events:none}
-.hud-l{grid-area:l;display:grid;gap:4px;justify-items:start}
-.hud-r{grid-area:r;justify-self:end;display:flex;gap:8px;align-items:flex-start}
-.pill{background:color-mix(in srgb,var(--surface) 88%,transparent);border:2px solid var(--line);border-radius:999px;padding:4px 10px;font-weight:800}
-.hearts{display:flex;gap:2px}
-.heart{width:24px;height:22px;transition:transform .3s,opacity .3s}
+/* world map */
+.map-box{background:var(--surface);border-radius:24px;box-shadow:var(--shadow);padding:8px;overflow:hidden}
+.map-box svg{width:100%;height:auto;display:block}
+.mp-node{cursor:pointer}
+.mp-node.locked{cursor:default}
+.mp-node .mp-ring{fill:none;stroke:var(--accent);stroke-width:6;opacity:0}
+.mp-node.next .mp-ring{opacity:1;animation:ringPulse 1.6s ease-in-out infinite}
+@keyframes ringPulse{0%,100%{stroke-width:5;opacity:.6}50%{stroke-width:10;opacity:1}}
+.mp-name{font-weight:600;font-size:22px;fill:#22333B}
+.mp-sub{font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;fill:#4F7077}
+.map-hint{color:var(--ink-soft);font-weight:700;margin:10px 0 0;text-align:center}
+/* store and characters */
+.store-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.store-head .hero-wrap{width:150px;flex:0 0 auto}
+.store-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--surface-2);border:2px solid var(--line);border-radius:18px;padding:4px;flex:1;min-width:240px}
+.st-tab{border:0;background:transparent;border-radius:14px;padding:10px 6px;font-weight:600;font-size:1.05rem;cursor:pointer;color:var(--ink-soft);min-height:44px}
+.st-tab.on{background:var(--accent);color:#fff}
+.store-grid{display:grid;gap:14px}
+.sgroup h3{font-size:1.05rem;margin:0 0 8px}
+.sgroup .note{font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:800;color:var(--ink-soft);margin-left:8px}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.item{border:2px solid var(--line);background:var(--surface-2);border-radius:18px;padding:10px 8px 12px;display:grid;justify-items:center;gap:4px;text-align:center}
+.item.on{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.item .gi,.item .pet{width:72px;height:72px}
+.item .axo{width:84px;height:auto}
+.item-name{font-weight:600;font-size:1rem}
+.item-blurb{font-size:.78rem;font-weight:700;color:var(--ink-soft);min-height:2.2em}
+.item .btn{font-size:.9rem;padding:8px 14px;min-height:38px;box-shadow:0 3px 0 var(--press)}
+.item .own{font-size:.8rem;font-weight:900;color:var(--good)}
+.chars-grid{display:grid;gap:14px}
+.chars-grid .items{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+.ch-lv{font-size:.8rem;font-weight:900;color:var(--ink-soft)}
+.wband{display:inline-block;border-radius:12px;padding:2px 10px;font-weight:800;font-size:.85rem;color:#22333B}
+/* the region stage */
+.stage{position:relative;aspect-ratio:16/11;width:min(100%,calc((100vh - 190px) * 16 / 11));width:min(100%,calc((100dvh - 190px) * 16 / 11));min-width:min(100%,300px);margin:0 auto;border-radius:22px;overflow:hidden;box-shadow:0 0 0 3px var(--line),var(--shadow);touch-action:none;user-select:none;-webkit-user-select:none;background:#2E5F6E}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage-hero{position:absolute;left:0;top:0;margin:0;max-width:none;pointer-events:none;will-change:transform;z-index:3}
+[data-world] .stage-hero .axo{animation:none}
+[data-world] .stage-hero.walking .axo{animation:waddle .5s ease-in-out infinite}
+@keyframes waddle{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(4deg) translateY(-3px)}}
+[data-world] .stage-hero.hurt .axo{animation:shake .5s}
+.stage-pet{position:absolute;left:0;top:0;pointer-events:none;will-change:transform;z-index:2}
+.stage-pet .pet{animation:bob 1.6s ease-in-out infinite}
+.hud{position:absolute;inset:0 0 auto 0;z-index:4;display:flex;justify-content:space-between;align-items:flex-start;gap:6px;padding:8px;pointer-events:none}
+.hud-l,.hud-r{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.hud-r{justify-content:flex-end}
+.hud-chip{background:color-mix(in srgb,var(--surface) 88%,transparent);border:2px solid var(--line);border-radius:999px;padding:3px 10px;font-weight:600;font-size:.95rem;display:inline-flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hud-chip .ic{width:1.1em;height:1.1em}
+.hearts{display:inline-flex;gap:1px}
+.heart{width:18px;height:17px;transition:transform .3s,opacity .3s}
 .heart.lost{opacity:.22;transform:scale(.7)}
 .heart.pop{animation:heartPop .55s}
-.qprog{width:min(130px,28vw);height:8px;margin:2px 2px 0}
-.eq{grid-area:eq;font-size:clamp(1.7rem,6vw,3rem);font-weight:700;padding:.1em .55em .14em;border-radius:22px;background:var(--surface);border:3px solid var(--line);box-shadow:var(--shadow);white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--ink)}
-.eq .x{color:var(--accent)}
-.eq .ans{display:inline-block;color:var(--sky)}
-.eq.wait .ans{animation:qBob 1.1s ease-in-out infinite}
-.eq.ok{border-color:var(--good)}.eq.ok .ans{color:var(--good);animation:ansPop .5s}
-.eq.miss{border-color:var(--bad)}.eq.miss .ans{color:var(--bad);animation:ansPop .5s}
-.eq.boss{color:var(--bad);font-size:clamp(1.2rem,4.5vw,2rem)}
-.score-box{text-align:right}
-.score{font-size:clamp(1.3rem,4vw,1.9rem);font-weight:700;font-variant-numeric:tabular-nums}
-.combo{margin-top:4px;display:inline-block;font-weight:900;font-size:.8rem;padding:2px 10px;border-radius:99px;background:var(--accent);color:#fff}
-.combo:empty{display:none}
-.combo.charged{background:linear-gradient(90deg,var(--accent),var(--sky),var(--good));animation:wig .6s ease-in-out infinite}
-.hud .icon-btn{pointer-events:auto;background:var(--surface)}
-.hud-small{font-weight:900;font-size:.8rem;color:var(--ink);background:color-mix(in srgb,var(--surface) 80%,transparent);border-radius:99px;padding:1px 8px;display:inline-block;font-variant-numeric:tabular-nums;white-space:nowrap}
-@media (max-width:620px){.hud{grid-template-columns:1fr 1fr;grid-template-areas:"l r" "eq eq";gap:4px 8px}.eq{justify-self:center;font-size:clamp(1.5rem,7vw,2.2rem)}.heart{width:20px;height:19px}.score-box .combo{display:none}}
-.hud-small:empty{display:none}
-.hud-small.beat{background:var(--good);color:#fff}
-.banner{position:absolute;left:50%;top:44%;z-index:5;transform:translate(-50%,-50%) scale(0);text-align:center;pointer-events:none;font-size:clamp(2.2rem,8vw,4.6rem);font-weight:700;color:#fff;-webkit-text-stroke:2px var(--accent);text-shadow:0 5px 0 var(--accent),0 10px 24px rgba(0,0,0,.25);white-space:nowrap;opacity:0;max-width:96%}
-.banner small{font-size:.38em;-webkit-text-stroke:0;color:var(--ink);text-shadow:none;background:var(--surface);border-radius:99px;padding:.15em .8em;margin-top:.25em;display:inline-block;white-space:normal}
-.banner.show{animation:bannerIn 1.35s ease-out forwards}
-.overlay{position:absolute;inset:0;z-index:6;display:grid;place-content:center;justify-items:center;gap:14px;background:color-mix(in srgb,var(--bg-deep) 80%,transparent);text-align:center;padding:16px}
-.overlay h2{font-size:2.4rem;color:var(--accent)}
-.timer{height:12px;margin:10px 0 0}
-.timer i{transition:none}
-.timer.low i{background:var(--bad)}
-.answers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
-@media (max-width:620px){.answers{grid-template-columns:1fr 1fr}}
-.ans-btn{position:relative;border:3px solid var(--ac);background:var(--surface);color:var(--ink);border-radius:20px;min-height:66px;font-weight:700;font-size:2rem;cursor:pointer;box-shadow:0 5px 0 var(--ac);transition:transform .08s;font-variant-numeric:tabular-nums;touch-action:manipulation}
-.ans-btn small{position:absolute;left:10px;top:5px;font-size:.7rem;font-weight:900;color:var(--ac);font-family:'Nunito',sans-serif}
-.ans-btn:hover:not(:disabled){transform:translateY(-2px)}
-.ans-btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 var(--ac)}
-.ans-btn.focus{outline:4px solid var(--ac);outline-offset:3px}
-.ans-btn.ok{background:var(--good);border-color:var(--good);color:#fff;box-shadow:0 5px 0 var(--good)}
-.ans-btn.bad{background:var(--bad);border-color:var(--bad);color:#fff;box-shadow:0 5px 0 var(--bad);animation:shake .4s}
-.ans-btn.dim{opacity:.4}
-.ans-btn:disabled{cursor:default}
-.lane-pad{display:none;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.touch .lane-pad{display:grid}
-@media (pointer:coarse){.lane-pad{display:grid}}
-.pad-btn{border:3px solid var(--line);background:var(--surface);color:var(--accent);border-radius:22px;height:64px;font-size:1.8rem;font-weight:700;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 6px 0 var(--press)}
-.pad-btn.held{transform:translateY(4px);box-shadow:0 2px 0 var(--press)}
+@keyframes heartPop{0%{transform:scale(1)}40%{transform:scale(1.6) rotate(-12deg)}100%{transform:scale(.7)}}
+.hud .icon-btn{pointer-events:auto;background:var(--surface);width:36px;height:36px}
+@media (max-width:520px){.hud-chip{font-size:.8rem;padding:2px 7px}.heart{width:14px;height:13px}#hudRoom{display:none}}
+.banner{position:absolute;left:50%;top:40%;z-index:5;transform:translate(-50%,-50%) scale(0);text-align:center;pointer-events:none;font-family:var(--display),sans-serif;font-size:clamp(1.6rem,6vw,3.2rem);font-weight:700;color:#fff;-webkit-text-stroke:2px var(--accent);text-shadow:0 5px 0 var(--accent),0 10px 24px rgba(0,0,0,.25);white-space:nowrap;opacity:0;max-width:96%}
+.banner small{font-size:.4em;-webkit-text-stroke:0;color:var(--ink);text-shadow:none;background:var(--surface);border-radius:99px;padding:.15em .8em;margin-top:.25em;display:inline-block;white-space:normal}
+.banner.show{animation:bannerIn 1.6s ease-out forwards}
+@keyframes bannerIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-6deg)}16%{opacity:1;transform:translate(-50%,-50%) scale(1.12) rotate(2deg)}28%{transform:translate(-50%,-50%) scale(1) rotate(0)}80%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-62%) scale(.92)}}
+#overlay{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:10px;background:rgba(20,30,40,.45)}
+.ov-card{background:var(--surface);border-radius:20px;padding:14px;width:min(560px,100%);max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);overflow:auto;display:grid;gap:10px;text-align:center;box-shadow:var(--shadow);color:var(--ink)}
+.ov-title{font-size:1.4rem;font-weight:700;color:var(--accent)}
+.ov-text{font-weight:700;font-size:1.02rem}
+.ov-text b{color:var(--accent)}
+.ov-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.ov-msg{font-weight:800;min-height:1.3em;color:var(--ink-soft)}
+.ov-msg.good{color:var(--good)}.ov-msg.bad{color:var(--bad)}
+.pd-who{width:78px;height:78px;margin:0 auto}
+.pd-who canvas{width:100%;height:100%}
+.pad-val{font-size:2.2rem;font-weight:700;min-height:1.3em;border-bottom:3px solid var(--line);max-width:220px;margin:0 auto;width:100%;font-variant-numeric:tabular-nums}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:260px;margin:0 auto;width:100%}
+.pad button{border:2px solid var(--line);background:var(--surface-2);border-radius:14px;min-height:44px;font-family:var(--display),sans-serif;font-weight:600;font-size:1.3rem;cursor:pointer;box-shadow:0 3px 0 var(--line);color:var(--ink)}
+.pad button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.pad button.go{background:var(--good);border-color:var(--good);color:#fff;box-shadow:0 3px 0 color-mix(in srgb,var(--good) 70%,#000)}
+@media (max-height:620px){.pad button{min-height:38px;font-size:1.1rem}.pad-val{font-size:1.7rem}.pd-who{width:56px;height:56px}}
+.bt-top{display:flex;align-items:center;gap:12px;text-align:left}
+.bt-mon{width:110px;height:110px;flex:0 0 auto}
+.bt-info{flex:1;min-width:0}
+.bt-name{font-size:1.35rem;font-weight:700;color:var(--bad)}
+.bt-sub{font-weight:800;color:var(--ink-soft);font-size:.9rem}
+.bt-hp{margin:6px 0 4px}
+.bt-hp i{background:var(--bad)}
+.bt-trail{display:flex;flex-wrap:wrap;gap:4px;min-height:26px;align-items:center}
+.bt-trail span{background:var(--bad-soft);border:2px solid var(--bad);border-radius:10px;padding:1px 8px;font-weight:800;font-size:.9rem}
+.bt-hero{display:flex;justify-content:center;gap:8px;align-items:center;font-weight:800}
+.bt-moves{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.mv-btn{border:3px solid var(--accent);background:var(--surface);color:var(--ink);border-radius:18px;min-height:60px;font-weight:700;font-size:1.7rem;cursor:pointer;box-shadow:0 5px 0 var(--accent);display:grid;place-items:center;gap:0;font-variant-numeric:tabular-nums;touch-action:manipulation}
+.mv-btn small{font-family:'Nunito',sans-serif;font-size:.68rem;font-weight:900;color:var(--ink-soft)}
+.mv-btn.dbl{border-color:var(--sky);box-shadow:0 5px 0 var(--sky);font-size:1.3rem}
+.mv-btn.armed{background:var(--sky);color:#fff}
+.mv-btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 var(--accent)}
+.mv-btn:disabled{opacity:.45;cursor:default}
+@media (max-width:420px){.mv-btn{min-height:52px;font-size:1.4rem}.bt-mon{width:84px;height:84px}}
+.dpad{display:none;grid-template-columns:repeat(3,62px);grid-template-rows:repeat(3,62px);gap:4px;justify-content:center;margin-top:12px}
+.touch .dpad,.dpad.force{display:grid}
+@media (pointer:coarse){.dpad{display:grid}}
+.dp{border:3px solid var(--line);background:var(--surface);color:var(--accent);border-radius:16px;font-size:1.6rem;font-weight:700;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 5px 0 var(--press)}
+.dp.held{transform:translateY(3px);box-shadow:0 2px 0 var(--press)}
+.dp-u{grid-area:1/2}.dp-l{grid-area:2/1}.dp-r{grid-area:2/3}.dp-d{grid-area:3/2}
 .hint{color:var(--ink-soft);font-size:.9rem;font-weight:700;text-align:center;margin:10px 0 0}
-
-/* sibling showdown */
-.duel{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:stretch}
-.duel-side{background:var(--surface);border:3px solid var(--line);border-radius:24px;padding:12px;display:grid;gap:10px;align-content:start;box-shadow:var(--shadow);transition:transform .2s}
-.duel-side.winner{border-color:var(--good);box-shadow:0 0 0 4px color-mix(in srgb,var(--good) 35%,transparent),var(--shadow)}
-.duel-side.locked{opacity:.65}
-.duel-side.hit{animation:shake .45s}
-.duel-head{display:flex;align-items:center;gap:10px}
-.duel-axo{width:84px;max-width:84px;margin:0;flex:0 0 auto}
-.duel-name{font-size:1.4rem;font-weight:700;color:var(--accent)}
-.duel-score{font-size:2.2rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
-.pad4{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto auto;gap:6px}
-.pad4 .ans-btn{min-height:58px;font-size:1.7rem}
-.pad4 .ans-btn small{left:7px;top:4px}
-.pad4 .k0{grid-area:1/2}.pad4 .k1{grid-area:2/1}.pad4 .k2{grid-area:2/3}.pad4 .k3{grid-area:3/2}
-.side-eq{grid-area:2/2;display:grid;place-items:center;font-size:1.3rem;font-weight:700;white-space:nowrap;color:var(--ink);font-variant-numeric:tabular-nums}
-.side-eq .x{color:var(--accent)}
-.duel-mid{display:grid;align-content:center;justify-items:center;gap:8px;min-width:120px;text-align:center}
-.duel-mid .eq{font-size:clamp(1.4rem,3.4vw,2rem)}
-.duel-mid .timer{width:min(160px,40vw);margin:0}
-.duel-msg{font-weight:800;color:var(--ink-soft);min-height:1.4em;font-size:.9rem}
-.touch .pad4 .ans-btn small,.touch .ans-btn small{display:none}
-@media (max-width:700px){
-  .duel{grid-template-columns:1fr;grid-template-rows:auto auto auto}
-  .duel-side.flip{transform:rotate(180deg)}
-  .duel-side.flip.hit{animation:none}
-  .duel-mid{min-width:0}
-  .duel-axo{width:64px;max-width:64px}
-}
-.duel-end{max-width:640px;margin:10px auto 0;text-align:center;display:grid;justify-items:center;gap:8px}
-.duel-title{font-size:clamp(2rem,6vw,3rem);font-weight:700;color:var(--accent)}
-.duel-pair{display:flex;gap:16px;justify-content:center;align-items:flex-end}
-.duel-pair .axo-box{max-width:150px;margin:0}
-.duel-pair .small{max-width:100px;opacity:.85}
-.duel-pair div{text-align:center;font-weight:800}
-
 /* results */
 .res{max-width:640px;margin:10px auto 0;text-align:center;display:grid;justify-items:center;gap:6px}
-.res .axo-box{max-width:180px}
+.res .hero-wrap{width:190px}
 .res-title{font-size:clamp(2rem,6vw,3rem);font-weight:700;color:var(--accent)}
 .res-sub{color:var(--ink-soft);font-weight:800;margin:0}
-.bigstars{display:flex;justify-content:center;gap:10px;margin:8px 0}
-.bigstars .st{width:66px;height:66px;transform:scale(.8);transition:transform .35s cubic-bezier(.2,1.6,.4,1),fill .2s}
-.bigstars .st.on{transform:scale(1.1) rotate(-6deg)}
 .stats4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%;margin:6px 0 10px}
 @media (max-width:520px){.stats4{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .sbox{background:var(--surface-2);border:2px solid var(--line);border-radius:16px;padding:8px 4px}
 .sbox b{display:block;font-family:var(--display),sans-serif;font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
 .sbox span{font-size:.72rem;font-weight:900;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em}
-.newbest{display:inline-block;background:var(--good);color:#fff;font-weight:900;border-radius:99px;padding:4px 14px;animation:wig 1s ease-in-out infinite}
-.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-.chip{font-family:var(--display),sans-serif;font-weight:600;font-size:1.2rem;background:var(--bad-soft);border:2px solid var(--bad);border-radius:14px;padding:3px 12px}
-.toast2{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--good);color:#fff;font-weight:900;padding:10px 18px;border-radius:99px;box-shadow:var(--shadow);z-index:60;pointer-events:none}
+.toast2{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--good);color:#fff;font-weight:900;padding:10px 18px;border-radius:99px;box-shadow:var(--shadow);z-index:60;pointer-events:none;max-width:92vw;text-align:center}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
-@keyframes bannerIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-6deg)}16%{opacity:1;transform:translate(-50%,-50%) scale(1.12) rotate(2deg)}28%{transform:translate(-50%,-50%) scale(1) rotate(0)}80%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-62%) scale(.92)}}
-@keyframes ansPop{0%{transform:scale(.4)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
-@keyframes qBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes heartPop{0%{transform:scale(1)}40%{transform:scale(1.6) rotate(-12deg)}100%{transform:scale(.7)}}
-@keyframes wig{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px) rotate(-2deg)}40%{transform:translateX(8px) rotate(2deg)}60%{transform:translateX(-6px)}80%{transform:translateX(5px)}}
 </style>
 <script>
 /*@@SW_JS@@*/
@@ -201,8 +180,8 @@ body{overflow:auto;min-height:100%}
 <main class="wrap">
   <section id="menu" class="screen">
     <div class="card">
-      <h1 class="brand-big">Times Table Worlds</h1>
-      <p class="lede">Race down the lanes and steer through the right answer, then battle the Grumpy Storm Cloud. Challenge a sibling in Showdown. Every 3 stars grows your world.</p>
+      <h1 class="brand-big">Math Quest Worlds</h1>
+      <p class="lede">Pick your hero, dress up, bring a pet and set off across eight worlds. Cross rivers on numbered stones, open the right doors, answer the elder and battle the boss of every region.</p>
     </div>
     <h2 class="who">Who's playing?</h2>
     <div id="kids" class="profile-grid"></div>
@@ -213,135 +192,116 @@ body{overflow:auto;min-height:100%}
   <section id="hub" class="screen" hidden>
     <div class="topbar2">
       <button id="switchBtn" class="btn btn-ghost btn-sm" type="button">Players</button>
-      <div id="hubBrand" class="brand">Times Table Lagoon</div>
-      <div class="stats"><span class="stat" id="statCur"></span><span class="stat" id="statStars"></span></div>
+      <div id="hubBrand" class="brand">Camp</div>
+      <div class="stats"><span class="stat" id="statCoins"></span><span class="stat" id="statLv"></span></div>
     </div>
     <div class="hub-grid">
       <div class="card hero-card">
-        <div id="hubLine" class="bubble">Time to race!</div>
-        <div id="hubHero" class="axo-box"></div>
+        <div id="hubLine" class="bubble">Ready for a quest?</div>
+        <div class="hero-wrap"><div id="hubHero" class="axo-box"></div><div id="hubPet" class="pet-box"></div></div>
         <div id="hubName" class="axo-name">Riley</div>
-        <div class="lv"><div id="lvTitle" class="lv-title">World level 1</div><div class="bar"><i id="lvBar"></i></div><small id="lvNext"></small></div>
+        <div class="lv"><div id="lvTitle" class="lv-title">Level 1</div><div class="bar"><i id="lvBar"></i></div><small id="lvNext"></small></div>
+        <div id="gearLine" class="gear-line"></div>
       </div>
       <div class="card">
-        <h3>Pick a times table</h3>
-        <div id="tables" class="tables"></div>
-        <button id="mixBtn" class="btn btn-sky btn-big mix" type="button">Mixed Mayhem<small id="mixBest">1s to 9s, extra practice on tricky facts</small></button>
-        <button id="duelBtn" class="btn btn-big mix" type="button">Sibling Showdown<small>2 players, one screen, best of 10</small></button>
-      </div>
-    </div>
-    <div class="hub-grid2">
-      <div class="card"><h3 id="charsTitle">Characters</h3><div id="chars" class="chars"></div></div>
-      <div class="card">
-        <h3 class="side-h">Pick your world</h3>
-        <div id="worlds" class="worlds"></div>
-        <h3 class="side-h">Sound</h3>
+        <h3>What next?</h3>
+        <div class="big-actions">
+          <button id="mapBtn" class="btn btn-big" type="button">World Map<small id="mapSub">Pick a region to explore</small></button>
+          <button id="storeBtn" class="btn btn-sky btn-big" type="button">Outfitter<small>Gear, outfits, pets and pet things</small></button>
+          <button id="charsBtn" class="btn btn-good btn-big" type="button">Characters<small>Play as any character from any world</small></button>
+        </div>
+        <h3 class="side-h" style="margin-top:14px">Sound</h3>
         <div class="toggles">
           <button id="tSound" class="tog" type="button" aria-pressed="true">Sounds</button>
           <button id="tMusic" class="tog" type="button" aria-pressed="true">Music</button>
-          <button id="tVoice" class="tog" type="button" aria-pressed="true">Read aloud</button>
         </div>
       </div>
     </div>
     <div class="card how">
       <h3>How to play</h3>
       <ul>
-        <li><b>The run:</b> you race down three lanes. Each gate shows the problem; steer into the lane with the right answer and grab the treats in between. <b>← →</b> or A D on a keyboard, swipe or tap left/right on a touch screen.</li>
-        <li>A wrong gate costs a heart. Streaks earn bonus treats and <b>Glow Mode</b> for double points. The run speeds up as you get answers right and eases off when you miss.</li>
-        <li><b>The boss:</b> after 9 gates the Grumpy Storm Cloud attacks. Pick the right answer (<b>1-4</b>, arrows + Enter, or tap) to strike back. Faster answers hit harder, <b>3 in a row</b> charges a special move, a wrong answer means a lightning strike.</li>
-        <li>Beat the boss for stars and a tougher boss next time. Every 3 stars adds something new to your world.</li>
-        <li><b>Sibling Showdown:</b> two kids, one screen, same problem. First right answer takes the point. Keyboard: W A D S on the left, arrow keys on the right.</li>
+        <li><b>Explore:</b> walk with the arrow keys, W A S D, or the pad on a touch screen. Walk into signs, people and chests to use them.</li>
+        <li><b>Puzzles are in the world:</b> hop across stones that add up to the sign's number, open the door that follows the rule, pay the troll the right toll, answer the elder to unlock a key.</li>
+        <li><b>Battles:</b> a monster tells you its HP once. Pick your moves and keep the running total in your head. Land on exactly 0 for double loot; overshoot and the loot scatters.</li>
+        <li><b>Beat the boss</b> behind the two-key door to clear a region and open the next one on the map.</li>
+        <li><b>Outfitter:</b> spend what you earn on useful gear (bigger moves, shields, charms, boots), outfits, a pet, and pet things that help on the road.</li>
       </ul>
     </div>
   </section>
 
+  <section id="map" class="screen" hidden>
+    <div class="topbar2">
+      <button id="mapBack" class="btn btn-ghost btn-sm" type="button">Camp</button>
+      <div class="brand">World Map</div>
+      <div class="stats"><span class="stat" id="mapCoins"></span><span class="stat" id="mapStars"></span></div>
+    </div>
+    <div id="mapBox" class="map-box"></div>
+    <p id="mapHint" class="map-hint">Tap a region to enter it. Beat its boss to open the next one.</p>
+  </section>
+
+  <section id="store" class="screen" hidden>
+    <div class="topbar2">
+      <button id="storeBack" class="btn btn-ghost btn-sm" type="button">Camp</button>
+      <div class="brand">Outfitter</div>
+      <div class="stats"><span class="stat" id="storeCoins"></span></div>
+    </div>
+    <div class="card">
+      <div class="store-head">
+        <div class="hero-wrap"><div id="storeHero" class="axo-box"></div><div id="storePet" class="pet-box"></div></div>
+        <div id="storeTabs" class="store-tabs" role="tablist">
+          <button class="st-tab on" type="button" data-tab="gear" role="tab">Gear</button>
+          <button class="st-tab" type="button" data-tab="outfits" role="tab">Outfits</button>
+          <button class="st-tab" type="button" data-tab="pets" role="tab">Pets</button>
+        </div>
+      </div>
+      <div id="storeGrid" class="store-grid"></div>
+    </div>
+  </section>
+
+  <section id="chars" class="screen" hidden>
+    <div class="topbar2">
+      <button id="charsBack" class="btn btn-ghost btn-sm" type="button">Camp</button>
+      <div class="brand">Characters</div>
+    </div>
+    <div id="charsGrid" class="chars-grid"></div>
+  </section>
+
   <section id="game" class="screen" hidden>
     <div id="stage" class="stage">
-      <div id="stageScene" class="scene" aria-hidden="true"></div>
       <canvas id="cv"></canvas>
-      <div id="heroPos"><div id="heroBox" class="axo-box"></div></div>
+      <div id="petEl" class="stage-pet"></div>
+      <div id="heroEl" class="axo-box stage-hero"></div>
       <div class="hud">
-        <div class="hud-l"><div id="hearts" class="hearts pill"></div><div id="stageLbl" class="hud-small">Gate 1 of 12</div><div class="bar qprog"><i id="progBar"></i></div></div>
-        <div id="eq" class="eq">Ready?</div>
-        <div class="hud-r"><div class="score-box"><div id="score" class="score pill">0</div><div id="topLbl" class="hud-small"></div><div id="combo" class="combo"></div></div><button id="pauseBtn" class="icon-btn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button></div>
+        <div class="hud-l"><span class="hud-chip"><span id="hudHearts" class="hearts"></span></span><span id="hudRoom" class="hud-chip"></span></div>
+        <div class="hud-r"><span id="hudCoins" class="hud-chip"></span><span id="hudKeys" class="hud-chip"></span><button id="pauseBtn" class="icon-btn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button></div>
       </div>
       <div id="banner" class="banner"></div>
-      <div id="pauseMenu" class="overlay" hidden>
-        <h2>Paused</h2>
-        <button id="resumeBtn" class="btn btn-good btn-big" type="button">Keep playing</button>
-        <button id="quitBtn" class="btn btn-ghost" type="button">End game and save score</button>
-      </div>
+      <div id="overlay" hidden></div>
     </div>
-    <div id="timerBar" class="bar timer" hidden><i></i></div>
-    <div id="answers" class="answers" hidden></div>
-    <div id="lanePad" class="lane-pad">
-      <button id="padL" class="pad-btn" type="button" aria-label="Move left">◀</button>
-      <button id="padR" class="pad-btn" type="button" aria-label="Move right">▶</button>
+    <div id="dpad" class="dpad">
+      <button class="dp dp-u" type="button" data-d="up" aria-label="Up">▲</button>
+      <button class="dp dp-l" type="button" data-d="left" aria-label="Left">◀</button>
+      <button class="dp dp-r" type="button" data-d="right" aria-label="Right">▶</button>
+      <button class="dp dp-d" type="button" data-d="down" aria-label="Down">▼</button>
     </div>
-    <p class="hint" id="gameHint">← → to change lanes · swipe or tap left and right on a touch screen · P to pause</p>
+    <p class="hint" id="gameHint">Arrow keys or W A S D to walk · walk into things to use them · Esc to pause</p>
   </section>
 
-  <section id="duelSetup" class="screen" hidden>
-    <div class="topbar2">
-      <button id="duelBack" class="btn btn-ghost btn-sm" type="button">Back</button>
-      <div class="brand">Sibling Showdown</div>
-    </div>
-    <div class="card" style="margin-bottom:14px"><h3 id="duelWho">Who's the challenger?</h3><div id="duelKids" class="profile-grid"></div></div>
-    <div class="card"><h3>Pick a times table</h3><div id="duelTables" class="tables"></div><button id="duelMix" class="btn btn-sky btn-big mix" type="button">Mixed Mayhem<small>1s to 9s</small></button></div>
-  </section>
-
-  <section id="duel" class="screen" hidden>
-    <div id="duelBox" class="duel">
-      <div class="duel-side flip" id="sideA">
-        <div class="duel-head"><div class="axo-box duel-axo" id="axoA"></div><div><div class="duel-name" id="nameA"></div><div class="duel-score" id="scoreA">0</div></div></div>
-        <div class="pad4" id="padA"></div>
-      </div>
-      <div class="duel-mid">
-        <div id="duelRound" class="hud-small">Round 1 of 10</div>
-        <div id="duelEq" class="eq">Ready?</div>
-        <div id="duelTimer" class="bar timer"><i></i></div>
-        <div id="duelMsg" class="duel-msg"></div>
-      </div>
-      <div class="duel-side" id="sideB">
-        <div class="duel-head"><div class="axo-box duel-axo" id="axoB"></div><div><div class="duel-name" id="nameB"></div><div class="duel-score" id="scoreB">0</div></div></div>
-        <div class="pad4" id="padB"></div>
-      </div>
-      <div id="duelBanner" class="banner"></div>
-    </div>
-    <p class="hint">Left side: W A D S · Right side: arrow keys · or tap your own pad · P to pause</p>
-    <div class="row" style="justify-content:center;margin-top:8px"><button id="duelQuit" class="btn btn-ghost btn-sm" type="button">Quit showdown</button></div>
-  </section>
-
-  <section id="duelEnd" class="screen" hidden>
-    <div class="card duel-end">
-      <h2 id="duelTitle" class="duel-title">Charlie wins!</h2>
-      <p id="duelSub" class="res-sub">6 – 4 on the 7s</p>
-      <div id="duelPair" class="duel-pair"></div>
-      <div id="duelPractice"></div>
-      <div class="row" style="justify-content:center;margin-top:8px">
-        <button id="duelAgain" class="btn btn-big" type="button">Rematch</button>
-        <button id="duelHub" class="btn btn-sky btn-big" type="button">Back to the hub</button>
-      </div>
-    </div>
-  </section>
-
-  <section id="results" class="screen" hidden>
+  <section id="clear" class="screen" hidden>
     <div class="card res">
-      <div id="resHero" class="axo-box"></div>
-      <h2 id="resTitle" class="res-title">Splash-tastic round!</h2>
-      <p id="resSub" class="res-sub">The 7s</p>
-      <div id="resStars" class="bigstars"></div>
-      <div id="resBest"></div>
+      <div class="hero-wrap"><div id="clearHero" class="axo-box"></div><div id="clearPet" class="pet-box"></div></div>
+      <h2 id="clearTitle" class="res-title">Region cleared!</h2>
+      <p id="clearSub" class="res-sub"></p>
       <div class="stats4">
-        <div class="sbox"><b id="rScore">0</b><span>Score</span></div>
-        <div class="sbox"><b id="rFirst">0</b><span>Right answers</span></div>
-        <div class="sbox"><b id="rCombo">0</b><span>Best streak</span></div>
-        <div class="sbox"><b id="rCur">0</b><span id="rCurL">Pearls</span></div>
+        <div class="sbox"><b id="cCoins">0</b><span id="cCoinsL">Coins</span></div>
+        <div class="sbox"><b id="cXp">0</b><span>XP</span></div>
+        <div class="sbox"><b id="cBattles">0</b><span>Battles won</span></div>
+        <div class="sbox"><b id="cPerfect">0</b><span>Exact finishes</span></div>
       </div>
-      <div id="practice"></div>
+      <div id="clearNote" class="res-sub"></div>
       <div class="row" style="justify-content:center;margin-top:8px">
-        <button id="againBtn" class="btn btn-big" type="button">Play again</button>
-        <button id="hubBtn" class="btn btn-sky btn-big" type="button">Pick another table</button>
+        <button id="clearMap" class="btn btn-big" type="button">World Map</button>
+        <button id="clearStore" class="btn btn-sky btn-big" type="button">Outfitter</button>
       </div>
     </div>
   </section>

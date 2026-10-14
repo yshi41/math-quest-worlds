@@ -1,5 +1,5 @@
 {
-  "name": "times-table-saves",
+  "name": "math-quest-saves",
   "main": "src/index.js",
   "compatibility_date": "2026-06-01",
   "workers_dev": true,
