@@ -3,7 +3,7 @@
    kept in a history table for recovery. Shares the D1 database with Spelling Worlds, in its own tables. */
 import { mergeState, lowersProgress, KIDS } from './logic.mjs';
 
-const ID_RE = /^(charlie|riley|vera|cora|addie|amy|hallie|qa-[a-z0-9-]{1,32})$/;
+const ID_RE = /^(charlie|riley|yan|qa-[a-z0-9-]{1,32})$/;
 const MAX_BYTES = 200000;
 const KEEP_HISTORY = 300;
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '86400' };

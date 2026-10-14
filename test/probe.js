@@ -1,10 +1,10 @@
-/* Quick look: node probe.js ../index.html  (screenshots in test/, console errors printed) */
+/* Quick look at the v2 engine: node probe.js ../index.html [w h touch]  (screenshots in test/, console errors printed) */
 const puppeteer = require('puppeteer-core');
 const path = require('path');
 const { create } = require('./mockcloud.js');
 const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const file = path.resolve(process.argv[2] || '../index.html');
-const F = 'file:///' + file.replace(/\\/g, '/');
+const F = 'file:///' + file.split(path.sep).join('/');
 const wait = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   const browser = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--mute-audio', '--disable-speech-api', '--disable-gpu'] });
@@ -14,31 +14,22 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await p.setViewport({ width: +(process.argv[3] || 1000), height: +(process.argv[4] || 800), hasTouch: !!process.argv[5] });
   await p.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
   const mock = create(); await mock.attach(p);
-  mock.store.riley = { rev: 1, state: { cur: 'lagoon:axolotl', chars: { 'lagoon:axolotl': { coins: 1000, xp: 120, clears: {}, own: ['w2', 'o1', 'o24'], wear: [1, 24], gear: { weapon: 'w2', shield: null, charm: null, boots: null }, pets: ['pup'], pet: 'pup', petOwn: ['pc1', 't1'], petWear: ['pc1'], petTag: 't1', runs: 0, wins: 0 } } } };
+  mock.store.riley = { rev: 1, state: { cur: 'lagoon:axolotl', chars: { 'lagoon:axolotl': { coins: 120, xp: 60, clears: {}, inv: { melee: ['m2', 'm3'], ranged: ['r3', 'r5'], armor: ['a1'] }, equip: { melee: 'm2', ranged: 'r3', armor: 'a1' }, hearts: 6, runs: 0, wins: 0, kills: 0, own: [], wear: [], pets: [], pet: null, petOwn: [], petWear: [], petTag: null } } } };
   await p.goto(F); await wait(800);
   const shot = n => p.screenshot({ path: 'probe-' + n + '.png' });
   await shot('menu');
   await p.evaluate(() => document.querySelector('.profile-card[data-id="riley"]').click()); await wait(400); await shot('hub');
-  await p.click('#storeBtn'); await wait(300); await shot('store-gear');
-  await p.evaluate(() => document.querySelector('.st-tab[data-tab="outfits"]').click()); await wait(300); await shot('store-outfits');
-  await p.evaluate(() => document.querySelector('.st-tab[data-tab="pets"]').click()); await wait(300); await shot('store-pets');
-  await p.click('#storeBack'); await wait(200); await p.click('#charsBtn'); await wait(400); await shot('chars');
-  await p.click('#charsBack'); await wait(200); await p.click('#mapBtn'); await wait(400); await shot('map');
+  await p.click('#mapBtn'); await wait(400); await shot('map');
   await p.evaluate(() => document.querySelector('.mp-node[data-k="lagoon"]').dispatchEvent(new MouseEvent('click', { bubbles: true }))); await wait(700); await shot('entrance');
-  await p.keyboard.down('ArrowUp'); await wait(1400); await p.keyboard.up('ArrowUp'); await wait(500); await shot('hall');
-  console.log('room after walking up:', await p.evaluate(() => window.__mq.G.room.tag), 'hero', await p.evaluate(() => JSON.stringify([__mq.G.hero.x.toFixed(2), __mq.G.hero.y.toFixed(2)])));
-  await p.evaluate(() => window.__mq.Game.teleport('stones', 7.5, 7.5)); await wait(300); await shot('stones');
-  await p.evaluate(() => window.__mq.Game.teleport('doors', 7.5, 5.5)); await wait(300); await shot('doors');
-  await p.evaluate(() => window.__mq.Game.teleport('riddle', 7.5, 5.5)); await wait(300); await shot('riddle');
-  await p.evaluate(() => window.__mq.Game.teleport('den', 2.5, 5.5)); await wait(300); await shot('den');
-  await p.evaluate(() => { const e = window.__mq.Game.enemies()[0]; window.__mq.Game.startBattle(e); }); await wait(500); await shot('battle');
-  await p.evaluate(() => window.__mq.Battle.pick(2)); await wait(1200); await shot('battle2');
-  console.log('battle state:', await p.evaluate(() => { const B = window.__mq.Battle.B; return B ? JSON.stringify({ hp: B.info.hp, dealt: B.dealt, hearts: B.hearts, turn: B.turn }) : 'ended'; }));
-  await p.evaluate(() => { const B = window.__mq.Battle.B; if (B) window.__mq.Ov.close(); });
-  await p.evaluate(() => window.__mq.Game.teleport('riddle', 7.5, 5.5)); await wait(200);
-  await p.evaluate(() => { const rm = window.__mq.Game.room(); const o = Object.values(rm.obj).find(o => o.kind === 'elder'); window.__mq.Game.interact(o); }); await wait(400); await shot('pad');
-  await p.evaluate(() => window.__mq.Ov.submit(window.__mq.Game.puz().riddle.answer)); await wait(600); await shot('pad-ok');
-  await p.evaluate(() => window.__mq.Game.teleport('entrance', 7.5, 8.5)); await wait(200);
+  const kinds = await p.evaluate(() => window.__mq.G.region.kinds); console.log('puzzle kinds', kinds, 'boss', await p.evaluate(() => window.__mq.G.region.byTag.boss.bossType));
+  await p.keyboard.down('ArrowLeft'); await wait(300); await p.keyboard.up('ArrowLeft'); await shot('face-left');
+  await p.keyboard.down('ArrowUp'); await wait(2300); await p.keyboard.up('ArrowUp'); await wait(300); await shot('hall');
+  console.log('room after walking up:', await p.evaluate(() => window.__mq.G.room.tag));
+  await p.keyboard.press('z'); await wait(80); await shot('swing');
+  await p.keyboard.press('x'); await wait(120); await shot('shot');
+  for (const tag of ['pA', 'pB', 'pC', 'pD', 'pE', 'secret', 'arena', 'nest', 'bossgate', 'boss']) { await p.evaluate(t => window.__mq.Game.teleport(t, 7.5, 8.5), tag); await wait(250); await shot(tag + '-' + (await p.evaluate(t => window.__mq.G.region.byTag[t].kind || window.__mq.G.region.byTag[t].bossType || '', tag))); }
+  await p.evaluate(() => window.__mq.Game.teleport('arena', 7.5, 8.5)); await wait(100);
+  await p.evaluate(() => { const e = window.__mq.Game.enemies()[0]; window.__mq.Game.hitEnemy(e, 2, 'melee'); }); await wait(200); await shot('arena-hit');
   await p.keyboard.press('Escape'); await wait(300); await shot('pause');
   console.log('errors:', errs.length ? errs.join('\n') : 'none');
   await browser.close();

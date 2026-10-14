@@ -6,12 +6,15 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const pickOne=a=>a[ri(a.length)];
 const DPR=()=>Math.min(2,window.devicePixelRatio||1);
 const TAU=Math.PI*2;
-const BUILD_AT=Date.now();
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const curName=k=>WORLDS[k].cur;
 const starSvg=on=>`<svg viewBox="0 0 24 24" class="st${on?' on':''}" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg>`;
 const heartSvg='<svg viewBox="0 0 24 22" class="heart" aria-hidden="true"><path d="M12 21s-9-5.6-9-12.2C3 5.4 5.5 3 8.4 3c1.6 0 2.9.8 3.6 2 .7-1.2 2-2 3.6-2C18.5 3 21 5.4 21 8.8 21 15.4 12 21 12 21z" fill="#FF5C8A" stroke="#fff" stroke-width="1.5"/></svg>';
 const keySvg='<svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="#E0A000" stroke-width="2.6"/><path d="M10 10l7 7M14 14l2-2M16.5 16.5l2-2" stroke="#E0A000" stroke-width="2.6" stroke-linecap="round"/></svg>';
+const ammoSvg='<svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="11" r="6" fill="#7CD4FF" stroke="#2FAFC4" stroke-width="1.6"/><circle cx="14" cy="6" r="3.5" fill="#7CD4FF" stroke="#2FAFC4" stroke-width="1.6"/></svg>';
+const swordSvg='<svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 16 L13 7 L15 9 L6 18 Z" fill="#9AA3AC" stroke="#5A636B" stroke-width="1.2"/><path d="M3 13 L7 17" stroke="#8B5A2B" stroke-width="2.4" stroke-linecap="round"/></svg>';
+const bowSvg='<svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 3 Q15 10 6 17" fill="none" stroke="#8B5A2B" stroke-width="2" stroke-linecap="round"/><path d="M4 10 L16 10 M13 7 L16 10 L13 13" fill="none" stroke="#2FAFC4" stroke-width="1.8" stroke-linecap="round"/></svg>';
+const shieldSvg='<svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4 L10 2 L16 4 L16 10 Q16 15 10 18 Q4 15 4 10 Z" fill="#3B66E6" stroke="#2B4FB8" stroke-width="1.4"/></svg>';
 
 /* ---------- sound ---------- */
 const Snd={ctx:null,on:true,musicOn:true,timer:null,mode:'calm',bpm:108,
@@ -26,21 +29,21 @@ const Snd={ctx:null,on:true,musicOn:true,timer:null,mode:'calm',bpm:108,
   noise(dur,o={}){const c=this.ctx;if(!c||!this.on)return;const n=Math.floor(c.sampleRate*dur);const b=c.createBuffer(1,n,c.sampleRate);const d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);
     const s=c.createBufferSource();s.buffer=b;const fl=c.createBiquadFilter();fl.type='lowpass';fl.frequency.value=o.lp||2000;const g=c.createGain();g.gain.value=o.vol||.2;s.connect(fl);fl.connect(g);g.connect(this.out);s.start(c.currentTime+(o.delay||0))},
   click(){this.tone(660,.06,{type:'triangle',vol:.1})},
-  swish(){this.noise(.12,{vol:.1,lp:1800});this.tone(400,.1,{type:'triangle',vol:.05,slide:700})},
+  swish(){this.noise(.1,{vol:.12,lp:1800});this.tone(380,.09,{type:'triangle',vol:.06,slide:760})},
+  shoot(){this.tone(520,.12,{vol:.12,slide:1300});this.tone(900,.05,{type:'triangle',vol:.05,delay:.02})},
   pop(combo){this.noise(.07,{vol:.25,lp:4500});const sc=[0,2,4,7,9,12,14,16,19,21,24];const r=67+sc[Math.min(Math.max(combo||1,1)-1,10)];[0,4,7,12].forEach((d,i)=>this.tone(this.f(r+d),.17,{type:'triangle',vol:.18,delay:i*.055}))},
-  wrong(){this.tone(196,.34,{type:'sawtooth',vol:.14,slide:98,lp:900});this.tone(207,.34,{type:'square',vol:.06,slide:104,lp:700});this.noise(.14,{vol:.12,lp:600})},
+  wrong(){this.tone(196,.3,{type:'sawtooth',vol:.13,slide:98,lp:900});this.noise(.12,{vol:.12,lp:600})},
   tick(){this.tone(1200,.03,{type:'square',vol:.04,lp:3000})},
   glow(){[72,76,79,84,88,91,96].forEach((m,i)=>this.tone(this.f(m),.14,{type:'triangle',vol:.15,delay:i*.05}))},
+  hit(){this.noise(.14,{vol:.28,lp:1200});this.tone(220,.16,{vol:.22,slide:90})},
   bossHit(){this.noise(.4,{vol:.4,lp:800});this.tone(130,.45,{vol:.4,slide:45})},
-  hit(){this.noise(.18,{vol:.3,lp:1200});this.tone(220,.2,{vol:.25,slide:90})},
-  special(){for(let i=0;i<6;i++)this.tone(300+i*120,.12,{vol:.12,slide:1600,delay:i*.09});this.noise(.6,{vol:.3,lp:1500,delay:.5})},
-  thunder(){this.noise(.9,{vol:.5,lp:400});this.tone(90,.8,{type:'sawtooth',vol:.14,slide:35,lp:500});this.tone(1800,.08,{type:'square',vol:.06,lp:4000})},
   splash(){this.noise(.5,{vol:.35,lp:900});this.tone(500,.3,{type:'sine',vol:.1,slide:120})},
   unlock(){[79,84,88,91].forEach((m,i)=>this.tone(this.f(m),.22,{type:'triangle',vol:.18,delay:i*.09}))},
   win(){[[72,0,.14],[76,.12,.14],[79,.24,.14],[84,.36,.3],[79,.62,.12],[84,.74,.7]].forEach(([m,d,l])=>{this.tone(this.f(m),l,{type:'triangle',vol:.2,delay:d});this.tone(this.f(m-12),l,{vol:.1,delay:d})})},
   lose(){[[67,0,.3],[66,.32,.3],[65,.64,.3],[64,.96,.9]].forEach(([m,d,l])=>this.tone(this.f(m),l,{type:'triangle',vol:.18,delay:d}))},
-  coin(){this.tone(988,.09,{type:'square',vol:.07});this.tone(1319,.32,{type:'square',vol:.07,delay:.08})},
+  coin(){this.tone(988,.08,{type:'square',vol:.06});this.tone(1319,.26,{type:'square',vol:.06,delay:.07})},
   key(){[84,88,91,96].forEach((m,i)=>this.tone(this.f(m),.3,{type:'sine',vol:.16,delay:i*.07}))},
+  hurt(){this.noise(.2,{vol:.3,lp:700});this.tone(160,.25,{type:'sawtooth',vol:.12,slide:60,lp:600})},
   startMusic(mode){this.mode=mode;this.bpm=mode==='boss'?126:104;if(!this.ctx||this.timer)return;this.step=0;this.next=this.ctx.currentTime+.08;this.timer=setInterval(()=>this.sched(),60)},
   stopMusic(){clearInterval(this.timer);this.timer=null},
   sched(){const c=this.ctx;if(!c)return;while(this.next<c.currentTime+.25){this.play(this.step,this.next);this.next+=60/this.bpm/2;this.step++}},
@@ -52,8 +55,7 @@ const Snd={ctx:null,on:true,musicOn:true,timer:null,mode:'calm',bpm:108,
     if(!boss&&s===6&&Math.random()<.5)this.tone(this.f(ch[2]+24),.3,{vol:.12,when:t,dest:this.mus})}
 };
 
-/* ---------- worlds on the page ---------- */
-let DISP='Fredoka';
+/* ---------- worlds on the page (the camp keeps the Spelling Worlds scenery) ---------- */
 function buildScene(){const k=world();let seed={lagoon:7,candy:11,canopy:5,ocean:13,bows:17,boba:19,birds:23,cheer:29}[k]||7;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280};
   const tops={lagoon:lagoonTop,candy:candyTop,canopy:canopyTop,ocean:oceanTop,bows:bowsTop,boba:bobaTop,birds:birdsTop,cheer:cheerTop},bots={lagoon:lagoonBottom,candy:candyBottom,canopy:canopyBottom,ocean:oceanBottom,bows:bowsBottom,boba:bobaBottom,birds:birdsBottom,cheer:cheerBottom};
   return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" aria-hidden="true">'+tops[k](rnd)+bots[k](rnd)+extraScene(rnd)+'</svg><div class="flash"></div>'}
@@ -63,27 +65,26 @@ function ambient(){const b=$('#bubbles');b.innerHTML='';for(let i=0;i<14;i++){co
 let shownWorld=null;
 function applyWorld(k,lv){CUR_WORLD=k;document.documentElement.setAttribute('data-world',k);
   if(shownWorld!==k){shownWorld=k;$('#pageScene').innerHTML=buildScene();ambient()}
-  setSceneLevel($('#pageScene'),lv||1);
-  DISP=(getComputedStyle(document.documentElement).getPropertyValue('--display')||'Fredoka').trim()||'Fredoka'}
+  setSceneLevel($('#pageScene'),lv||1)}
 function cssVar(name,fallback){const v=getComputedStyle(document.documentElement).getPropertyValue(name).trim();return v||fallback}
 function charName(k,id){const L=charListFor(k);for(const c of L)if(c[0]===id)return c[1];return L[0][1]}
 function charId(){return CUR_CHAR}
 let CUR_CHAR='axolotl';
-/* outfit slots: which levels share a slot (SLOTS comes from Spelling Worlds) */
-function slotsOfLv(lv){const o=[];Object.keys(SLOTS).forEach(s=>{if(SLOTS[s].indexOf(lv)>=0)o.push(s)});return o}
 
 /* ---------- saves (online only) ---------- */
 let screen='menu';
 let ready=false,saveMode='loading';
 const saves={};let player=null;
-function blankRec(){return {coins:0,xp:0,clears:{},own:[],wear:[],gear:{weapon:null,shield:null,charm:null,boots:null},pets:[],pet:null,petOwn:[],petWear:[],petTag:null,runs:0,wins:0}}
+function blankRec(){return {coins:0,xp:0,clears:{},inv:{melee:['m2'],ranged:['r3'],armor:[]},equip:{melee:'m2',ranged:'r3',armor:null},hearts:5,runs:0,wins:0,kills:0,own:[],wear:[],pets:[],pet:null,petOwn:[],petWear:[],petTag:null}}
 function blank(){return {cur:null,chars:{}}}
 const isObj=o=>o&&typeof o==='object'&&!Array.isArray(o);
-function normRec(r){const b=Object.assign(blankRec(),isObj(r)?r:{});b.coins=Math.max(0,b.coins|0);b.xp=Math.max(0,b.xp|0);b.runs=b.runs|0;b.wins=b.wins|0;
-  b.clears=isObj(b.clears)?b.clears:{};b.own=Array.isArray(b.own)?b.own.filter(x=>typeof x==='string'):[];b.wear=Array.isArray(b.wear)?b.wear.map(Number).filter(x=>x>0):[];
-  b.gear=Object.assign({weapon:null,shield:null,charm:null,boots:null},isObj(b.gear)?b.gear:{});for(const s in b.gear){if(b.gear[s]&&(!GEAR_BY_ID[b.gear[s]]||GEAR_BY_ID[b.gear[s]].slot!==s))b.gear[s]=null}
+function normRec(r){const b=Object.assign(blankRec(),isObj(r)?r:{});b.coins=Math.max(0,b.coins|0);b.xp=Math.max(0,b.xp|0);b.runs=b.runs|0;b.wins=b.wins|0;b.kills=b.kills|0;b.hearts=clamp(b.hearts|0||5,5,12);
+  b.clears=isObj(b.clears)?b.clears:{};
+  const inv=isObj(b.inv)?b.inv:{};b.inv={melee:['m2'],ranged:['r3'],armor:[]};for(const k of ['melee','ranged','armor']){(Array.isArray(inv[k])?inv[k]:[]).forEach(id=>{if(ITEM_BY_ID[id]&&ITEM_BY_ID[id].kind===k&&!b.inv[k].includes(id))b.inv[k].push(id)})}
+  const eq=isObj(b.equip)?b.equip:{};b.equip={melee:b.inv.melee.includes(eq.melee)?eq.melee:'m2',ranged:b.inv.ranged.includes(eq.ranged)?eq.ranged:'r3',armor:b.inv.armor.includes(eq.armor)?eq.armor:null};
+  b.own=Array.isArray(b.own)?b.own.filter(x=>typeof x==='string'):[];b.wear=Array.isArray(b.wear)?b.wear.map(Number).filter(x=>x>0):[];
   b.pets=Array.isArray(b.pets)?b.pets.filter(x=>PET_BY_ID[x]):[];b.pet=b.pet&&b.pets.includes(b.pet)?b.pet:null;b.petOwn=Array.isArray(b.petOwn)?b.petOwn.filter(x=>PET_BY_ID[x]):[];
-  b.petWear=Array.isArray(b.petWear)?b.petWear.filter(x=>b.petOwn.includes(x)):[];b.petTag=b.petTag&&b.petOwn.includes(b.petTag)?b.petTag:null;return b}
+  b.petWear=Array.isArray(b.petWear)?b.petWear.filter(x=>b.petOwn.includes(x)):[];b.petTag=b.petTag&&b.petOwn.includes(b.petTag)?b.petTag:null;delete b.gear;return b}
 function normalize(d){const o=isObj(d)?d:{};const b=blank();b.cur=typeof o.cur==='string'&&validChar(o.cur)?o.cur:null;b.chars={};if(isObj(o.chars))for(const k in o.chars)if(validChar(k))b.chars[k]=normRec(o.chars[k]);return b}
 function validChar(key){const [w,c]=String(key).split(':');return !!(WORLDS[w]&&charListFor(w).some(x=>x[0]===c))}
 function P(){return saves[player]||(saves[player]=blank())}
@@ -96,15 +97,17 @@ function recView(id){const p=saves[id];const key=curKey(id);return (p&&p.chars[k
 function levelOf(xp){let l=0;for(const t of LV_XP)if(xp>=t)l++;return Math.max(1,l)}
 function xpNext(xp){const l=levelOf(xp);return l<LV_XP.length?LV_XP[l]:null}
 function clearsOf(r){return Object.keys(r.clears||{}).filter(k=>r.clears[k]).length}
-/* the hero's numbers from the gear it wears */
-function heroStats(r){const w=r.gear.weapon&&GEAR_BY_ID[r.gear.weapon]||WEAPONS[0],sh=r.gear.shield&&GEAR_BY_ID[r.gear.shield],ch=r.gear.charm&&GEAR_BY_ID[r.gear.charm],bt=r.gear.boots&&GEAR_BY_ID[r.gear.boots];
+function themeOf(k,c){return ATTACKS[c]||Object.assign({body:'#F9B4C3'},ATTACK_BY_WORLD[k]||ATTACK_BY_WORLD.lagoon)}
+/* the hero's numbers: melee value M, ranged value R, armour block, hearts, and every weapon number owned */
+function heroStats(r,k,c){const me=ITEM_BY_ID[r.equip.melee]||ITEM_BY_ID.m2,ra=ITEM_BY_ID[r.equip.ranged]||ITEM_BY_ID.r3,ar=r.equip.armor?ITEM_BY_ID[r.equip.armor]:null;
+  const divs=[...new Set(r.inv.melee.concat(r.inv.ranged).map(id=>ITEM_BY_ID[id]&&ITEM_BY_ID[id].v).filter(Boolean))].sort((a,b)=>a-b);
   const tag=r.pet&&r.petTag?r.petTag:null;
-  return {moves:w.moves,weapon:w,block:sh?sh.block:0,maxHearts:5+(ch?ch.hearts:0),revive:!!(ch&&ch.revive),miss:(bt&&bt.miss?1:0)+(tag==='t4'?1:0),dodge:!!(bt&&bt.dodge),tag,bell:tag==='t1',nose:tag==='t2',snack:tag==='t3',guard:tag==='t5'}}
-/* the order a kid meets the regions: home first, then around the ring */
+  return {M:me.v,R:ra.v,melee:me,ranged:ra,armor:ar,block:ar?ar.block:0,maxHearts:r.hearts,divs,theme:themeOf(k,c),tag,miss:tag==='t4'?1:0,bell:tag==='t1',snack:tag==='t3',nose:tag==='t2',guard:tag==='t5'}}
 function orderFor(id){const home=kid(id).theme,i=RING.indexOf(home);return RING.slice(i).concat(RING.slice(0,i))}
 function tierOf(k,id){return orderFor(id).indexOf(k)+1}
 function unlocked(r,k,id){const o=orderFor(id),i=o.indexOf(k);return i===0||!!(r.clears&&r.clears[o[i-1]])}
 function nextRegion(r,id){const o=orderFor(id);for(const k of o)if(!(r.clears&&r.clears[k]))return k;return null}
+function giveItem(r,id){const it=ITEM_BY_ID[id];if(!it)return false;if(it.kind==='heart'){r.hearts=Math.min(12,r.hearts+1);return true}if(r.inv[it.kind].includes(id))return false;r.inv[it.kind].push(id);return true}
 
 /* the save service: the Worker named by window.MQ_CLOUD. Progress lives only there; nothing is kept in the browser.
    Each save names the revision it started from plus the copy it started from (base), so the service merges saves from two devices itself. */
@@ -139,7 +142,7 @@ const Net=(()=>{
 })();
 function persist(){if(player&&CLOUD)Net.schedule(player)}
 function renderSaveNote(){const n=$('#saveNote');
-  n.textContent=saveMode==='loading'?'Loading saves…':saveMode==='on'?'Coins, gear, pets and cleared regions save online for every player.':saveMode==='error'?'Can’t reach the save server. Check the connection and try again.':'No save service on this copy, so nothing is kept.';
+  n.textContent=saveMode==='loading'?'Loading saves…':saveMode==='on'?'Coins, found gear and cleared regions save online for every player.':saveMode==='error'?'Can’t reach the save server. Check the connection and try again.':'No save service on this copy, so nothing is kept.';
   $('#saveRetry').hidden=saveMode!=='error'}
 function setReady(mode){saveMode=mode;ready=mode==='on';renderSaveNote();if(screen==='menu')renderMenu()}
 

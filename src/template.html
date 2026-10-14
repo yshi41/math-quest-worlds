@@ -4,41 +4,37 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
 <style>
 /*@@SW_CSS@@*/
-/* Math Quest Worlds: the Spelling Worlds palettes, scenery and characters above; the quest below.
-   One screen at a time in a 1000px column over the world's scene. The region plays on a 16:11 stage. */
+/* Math Quest Worlds: the Spelling Worlds palettes and characters above (camp only); the quest below.
+   One screen at a time in a 1000px column. The region plays on a 16:11 canvas stage. */
 body{overflow:auto;min-height:100%}
 #pageScene{z-index:0}
 .wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding-inline:16px;padding-block:14px 28px}
-h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-name,.res-title,.ov-title,.bt-name,.pad-val,.mv-btn,.st-tab,.item-name,.mp-name,.hud-chip{font-family:var(--display),'Nunito',sans-serif;line-height:1.2}
+h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.res-title,.ov-title,.item-name,.mp-name,.hud-chip{font-family:var(--display),'Nunito',sans-serif;line-height:1.2}
 .lede{color:var(--ink-soft);font-weight:700;margin:.4em 0 0;max-width:56ch}
 .brand-big{font-size:clamp(2.2rem,7vw,3.4rem);font-weight:700;color:var(--accent)}
 .who{font-size:1.5rem;margin:20px 0 12px}
-.profile-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.profile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .profile-card{border:3px solid transparent;border-radius:24px;padding:10px 8px 14px;display:grid;justify-items:center;gap:2px;cursor:pointer;color:#22333B;box-shadow:var(--shadow);transition:transform .15s}
 .profile-card:hover:not(:disabled){transform:translateY(-4px) rotate(-1deg)}
 .profile-card:disabled{opacity:.55;cursor:progress}
 .profile-card .axo{width:100px;height:auto}
+.profile-card .pc-meta svg{width:1.15em;height:1.15em;max-width:none}
 .pc-name{font-size:1.4rem;font-weight:700}
 .pc-meta{display:flex;gap:10px;align-items:center;font-weight:800;font-size:.9rem;opacity:.8;font-variant-numeric:tabular-nums}
-.profile-card .pc-meta svg{width:1.15em;height:1.15em;max-width:none}
 .pc-world{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
 .save-note{color:var(--ink-soft);font-size:.9rem;font-weight:700;margin:14px 0 0}
 @media (max-width:720px){.profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .ic{width:1.15em;height:1.15em;vertical-align:-.2em}
 .st{width:1.1em;height:1.1em;fill:var(--line);vertical-align:-.15em}
 .st.on{fill:var(--gold-deep)}
-/* hub */
 .topbar2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;background:color-mix(in srgb,var(--surface) 82%,transparent);border:2px solid var(--line);border-radius:22px;padding:8px 10px}
 .topbar2 .brand{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .hub-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:14px;margin-bottom:14px;align-items:start}
 @media (max-width:780px){.hub-grid{grid-template-columns:1fr}}
 .card h3{font-size:1.25rem;margin-bottom:12px}
 .hero-card{display:grid;justify-items:center;gap:8px;text-align:center}
-.hero-wrap{position:relative;width:min(240px,70vw)}
+.hero-wrap{position:relative;width:min(220px,70vw)}
 .hero-wrap .axo-box{max-width:none}
-.hero-wrap .pet-box{position:absolute;right:-18px;bottom:-6px;width:38%}
-.pet{width:100%;height:auto;display:block;overflow:visible}
-.pet-box .pet{animation:bob 2.6s ease-in-out infinite}
 .lv{width:100%;text-align:left}
 .lv-title{font-weight:700;color:var(--accent);font-size:1.1rem}
 .bar{height:12px;border-radius:99px;background:var(--surface-2);border:2px solid var(--line);overflow:hidden;margin:6px 0}
@@ -46,7 +42,6 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
 .lv small{color:var(--ink-soft);font-weight:700}
 .gear-line{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .gear-chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface-2);border:2px solid var(--line);border-radius:99px;padding:3px 10px;font-weight:800;font-size:.85rem}
-.gear-chip .gi{width:22px;height:22px}
 .big-actions{display:grid;gap:10px}
 .big-actions .btn{display:grid;gap:2px;text-align:left;padding:14px 20px;white-space:normal}
 .big-actions .btn small{font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:800;opacity:.9}
@@ -55,6 +50,7 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
 .tog[aria-pressed="true"]{border-color:var(--accent);color:var(--ink)}
 .how ul{margin:0;padding-left:1.1em;display:grid;gap:6px;color:var(--ink-soft);font-weight:700}
 .how b{color:var(--ink)}
+.pack-note{color:var(--ink-soft);font-weight:700;font-size:.9rem;margin:0 0 10px}
 /* world map */
 .map-box{background:var(--surface);border-radius:24px;box-shadow:var(--shadow);padding:8px;overflow:hidden}
 .map-box svg{width:100%;height:auto;display:block}
@@ -64,40 +60,25 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
 .mp-node.next .mp-ring{opacity:1;animation:ringPulse 1.6s ease-in-out infinite}
 @keyframes ringPulse{0%,100%{stroke-width:5;opacity:.6}50%{stroke-width:10;opacity:1}}
 .mp-name{font-weight:600;font-size:22px;fill:#22333B}
-.mp-sub{font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;fill:#4F7077}
+.mp-sub{font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;fill:#4F7077}
 .map-hint{color:var(--ink-soft);font-weight:700;margin:10px 0 0;text-align:center}
-/* store and characters */
-.store-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
-.store-head .hero-wrap{width:150px;flex:0 0 auto}
-.store-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--surface-2);border:2px solid var(--line);border-radius:18px;padding:4px;flex:1;min-width:240px}
-.st-tab{border:0;background:transparent;border-radius:14px;padding:10px 6px;font-weight:600;font-size:1.05rem;cursor:pointer;color:var(--ink-soft);min-height:44px}
-.st-tab.on{background:var(--accent);color:#fff}
-.store-grid{display:grid;gap:14px}
+/* backpack and characters */
+.sgroup{margin-bottom:14px}
 .sgroup h3{font-size:1.05rem;margin:0 0 8px}
 .sgroup .note{font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:800;color:var(--ink-soft);margin-left:8px}
 .items{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .item{border:2px solid var(--line);background:var(--surface-2);border-radius:18px;padding:10px 8px 12px;display:grid;justify-items:center;gap:4px;text-align:center}
 .item.on{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
-.item .gi,.item .pet{width:72px;height:72px}
+.item .gi{width:64px;height:64px}
 .item .axo{width:84px;height:auto}
 .item-name{font-weight:600;font-size:1rem}
 .item-blurb{font-size:.78rem;font-weight:700;color:var(--ink-soft);min-height:2.2em}
 .item .btn{font-size:.9rem;padding:8px 14px;min-height:38px;box-shadow:0 3px 0 var(--press)}
-.item .own{font-size:.8rem;font-weight:900;color:var(--good)}
-.chars-grid{display:grid;gap:14px}
-.chars-grid .items{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
-.ch-lv{font-size:.8rem;font-weight:900;color:var(--ink-soft)}
+.chars-grid .items{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
 .wband{display:inline-block;border-radius:12px;padding:2px 10px;font-weight:800;font-size:.85rem;color:#22333B}
 /* the region stage */
-.stage{position:relative;aspect-ratio:16/11;width:min(100%,calc((100vh - 190px) * 16 / 11));width:min(100%,calc((100dvh - 190px) * 16 / 11));min-width:min(100%,300px);margin:0 auto;border-radius:22px;overflow:hidden;box-shadow:0 0 0 3px var(--line),var(--shadow);touch-action:none;user-select:none;-webkit-user-select:none;background:#2E5F6E}
+.stage{position:relative;aspect-ratio:16/11;width:min(100%,calc((100vh - 230px) * 16 / 11));width:min(100%,calc((100dvh - 230px) * 16 / 11));min-width:min(100%,300px);margin:0 auto;border-radius:22px;overflow:hidden;box-shadow:0 0 0 3px var(--line),var(--shadow);touch-action:none;user-select:none;-webkit-user-select:none;background:#2E5F6E}
 #cv{position:absolute;inset:0;width:100%;height:100%;display:block}
-.stage-hero{position:absolute;left:0;top:0;margin:0;max-width:none;pointer-events:none;will-change:transform;z-index:3}
-[data-world] .stage-hero .axo{animation:none}
-[data-world] .stage-hero.walking .axo{animation:waddle .5s ease-in-out infinite}
-@keyframes waddle{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(4deg) translateY(-3px)}}
-[data-world] .stage-hero.hurt .axo{animation:shake .5s}
-.stage-pet{position:absolute;left:0;top:0;pointer-events:none;will-change:transform;z-index:2}
-.stage-pet .pet{animation:bob 1.6s ease-in-out infinite}
 .hud{position:absolute;inset:0 0 auto 0;z-index:4;display:flex;justify-content:space-between;align-items:flex-start;gap:6px;padding:8px;pointer-events:none}
 .hud-l,.hud-r{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .hud-r{justify-content:flex-end}
@@ -106,8 +87,6 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
 .hearts{display:inline-flex;gap:1px}
 .heart{width:18px;height:17px;transition:transform .3s,opacity .3s}
 .heart.lost{opacity:.22;transform:scale(.7)}
-.heart.pop{animation:heartPop .55s}
-@keyframes heartPop{0%{transform:scale(1)}40%{transform:scale(1.6) rotate(-12deg)}100%{transform:scale(.7)}}
 .hud .icon-btn{pointer-events:auto;background:var(--surface);width:36px;height:36px}
 @media (max-width:520px){.hud-chip{font-size:.8rem;padding:2px 7px}.heart{width:14px;height:13px}#hudRoom{display:none}}
 .banner{position:absolute;left:50%;top:40%;z-index:5;transform:translate(-50%,-50%) scale(0);text-align:center;pointer-events:none;font-family:var(--display),sans-serif;font-size:clamp(1.6rem,6vw,3.2rem);font-weight:700;color:#fff;-webkit-text-stroke:2px var(--accent);text-shadow:0 5px 0 var(--accent),0 10px 24px rgba(0,0,0,.25);white-space:nowrap;opacity:0;max-width:96%}
@@ -120,40 +99,21 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
 .ov-text{font-weight:700;font-size:1.02rem}
 .ov-text b{color:var(--accent)}
 .ov-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.ov-msg{font-weight:800;min-height:1.3em;color:var(--ink-soft)}
-.ov-msg.good{color:var(--good)}.ov-msg.bad{color:var(--bad)}
-.pd-who{width:78px;height:78px;margin:0 auto}
-.pd-who canvas{width:100%;height:100%}
-.pad-val{font-size:2.2rem;font-weight:700;min-height:1.3em;border-bottom:3px solid var(--line);max-width:220px;margin:0 auto;width:100%;font-variant-numeric:tabular-nums}
-.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:260px;margin:0 auto;width:100%}
-.pad button{border:2px solid var(--line);background:var(--surface-2);border-radius:14px;min-height:44px;font-family:var(--display),sans-serif;font-weight:600;font-size:1.3rem;cursor:pointer;box-shadow:0 3px 0 var(--line);color:var(--ink)}
-.pad button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
-.pad button.go{background:var(--good);border-color:var(--good);color:#fff;box-shadow:0 3px 0 color-mix(in srgb,var(--good) 70%,#000)}
-@media (max-height:620px){.pad button{min-height:38px;font-size:1.1rem}.pad-val{font-size:1.7rem}.pd-who{width:56px;height:56px}}
-.bt-top{display:flex;align-items:center;gap:12px;text-align:left}
-.bt-mon{width:110px;height:110px;flex:0 0 auto}
-.bt-info{flex:1;min-width:0}
-.bt-name{font-size:1.35rem;font-weight:700;color:var(--bad)}
-.bt-sub{font-weight:800;color:var(--ink-soft);font-size:.9rem}
-.bt-hp{margin:6px 0 4px}
-.bt-hp i{background:var(--bad)}
-.bt-trail{display:flex;flex-wrap:wrap;gap:4px;min-height:26px;align-items:center}
-.bt-trail span{background:var(--bad-soft);border:2px solid var(--bad);border-radius:10px;padding:1px 8px;font-weight:800;font-size:.9rem}
-.bt-hero{display:flex;justify-content:center;gap:8px;align-items:center;font-weight:800}
-.bt-moves{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.mv-btn{border:3px solid var(--accent);background:var(--surface);color:var(--ink);border-radius:18px;min-height:60px;font-weight:700;font-size:1.7rem;cursor:pointer;box-shadow:0 5px 0 var(--accent);display:grid;place-items:center;gap:0;font-variant-numeric:tabular-nums;touch-action:manipulation}
-.mv-btn small{font-family:'Nunito',sans-serif;font-size:.68rem;font-weight:900;color:var(--ink-soft)}
-.mv-btn.dbl{border-color:var(--sky);box-shadow:0 5px 0 var(--sky);font-size:1.3rem}
-.mv-btn.armed{background:var(--sky);color:#fff}
-.mv-btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 var(--accent)}
-.mv-btn:disabled{opacity:.45;cursor:default}
-@media (max-width:420px){.mv-btn{min-height:52px;font-size:1.4rem}.bt-mon{width:84px;height:84px}}
-.dpad{display:none;grid-template-columns:repeat(3,62px);grid-template-rows:repeat(3,62px);gap:4px;justify-content:center;margin-top:12px}
-.touch .dpad,.dpad.force{display:grid}
-@media (pointer:coarse){.dpad{display:grid}}
-.dp{border:3px solid var(--line);background:var(--surface);color:var(--accent);border-radius:16px;font-size:1.6rem;font-weight:700;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 5px 0 var(--press)}
+.ov-item .gi{width:96px;height:96px}
+.pz-gear{display:grid;gap:6px;text-align:left}
+.pz-gear .ov-row{justify-content:flex-start}
+/* controls under the stage */
+.controls{display:grid;grid-template-columns:auto auto;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;display:none}
+.touch .controls{display:grid}
+@media (pointer:coarse){.controls{display:grid}}
+.dpad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:4px}
+.dp{border:3px solid var(--line);background:var(--surface);color:var(--accent);border-radius:16px;font-size:1.4rem;font-weight:700;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 5px 0 var(--press)}
 .dp.held{transform:translateY(3px);box-shadow:0 2px 0 var(--press)}
 .dp-u{grid-area:1/2}.dp-l{grid-area:2/1}.dp-r{grid-area:2/3}.dp-d{grid-area:3/2}
+.abtns{display:grid;grid-template-columns:repeat(2,64px);grid-template-rows:repeat(2,64px);gap:8px}
+.ab{border:3px solid var(--line);background:var(--surface);border-radius:50%;font-family:var(--display),sans-serif;font-weight:700;font-size:1.1rem;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 5px 0 var(--press);display:grid;place-items:center;line-height:1}
+.ab small{font-family:'Nunito',sans-serif;font-size:.6rem;font-weight:900;color:var(--ink-soft)}
+.ab-a{color:var(--accent)}.ab-b{color:var(--sky)}.ab-q,.ab-e{font-size:.9rem;border-radius:18px}
 .hint{color:var(--ink-soft);font-size:.9rem;font-weight:700;text-align:center;margin:10px 0 0}
 /* results */
 .res{max-width:640px;margin:10px auto 0;text-align:center;display:grid;justify-items:center;gap:6px}
@@ -167,7 +127,6 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
 .sbox span{font-size:.72rem;font-weight:900;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em}
 .toast2{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--good);color:#fff;font-weight:900;padding:10px 18px;border-radius:99px;box-shadow:var(--shadow);z-index:60;pointer-events:none;max-width:92vw;text-align:center}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px) rotate(-2deg)}40%{transform:translateX(8px) rotate(2deg)}60%{transform:translateX(-6px)}80%{transform:translateX(5px)}}
 </style>
 <script>
 /*@@SW_JS@@*/
@@ -181,7 +140,7 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
   <section id="menu" class="screen">
     <div class="card">
       <h1 class="brand-big">Math Quest Worlds</h1>
-      <p class="lede">Pick your hero, dress up, bring a pet and set off across eight worlds. Cross rivers on numbered stones, open the right doors, answer the elder and battle the boss of every region.</p>
+      <p class="lede">Pick your hero and set off across eight worlds. Fight monsters with a melee swing and a ranged shot, hop the numbered stones, shoot the right targets, push the right blocks, and beat the boss of every region.</p>
     </div>
     <h2 class="who">Who's playing?</h2>
     <div id="kids" class="profile-grid"></div>
@@ -198,8 +157,8 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
     <div class="hub-grid">
       <div class="card hero-card">
         <div id="hubLine" class="bubble">Ready for a quest?</div>
-        <div class="hero-wrap"><div id="hubHero" class="axo-box"></div><div id="hubPet" class="pet-box"></div></div>
-        <div id="hubName" class="axo-name">Riley</div>
+        <div class="hero-wrap"><div id="hubHero" class="axo-box"></div></div>
+        <div id="hubName" class="axo-name">Axolotl</div>
         <div class="lv"><div id="lvTitle" class="lv-title">Level 1</div><div class="bar"><i id="lvBar"></i></div><small id="lvNext"></small></div>
         <div id="gearLine" class="gear-line"></div>
       </div>
@@ -207,8 +166,7 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
         <h3>What next?</h3>
         <div class="big-actions">
           <button id="mapBtn" class="btn btn-big" type="button">World Map<small id="mapSub">Pick a region to explore</small></button>
-          <button id="storeBtn" class="btn btn-sky btn-big" type="button">Outfitter<small>Gear, outfits, pets and pet things</small></button>
-          <button id="charsBtn" class="btn btn-good btn-big" type="button">Characters<small>Play as any character from any world</small></button>
+          <button id="charsBtn" class="btn btn-good btn-big" type="button">Characters<small>Play as any character from any world, each with its own attacks</small></button>
         </div>
         <h3 class="side-h" style="margin-top:14px">Sound</h3>
         <div class="toggles">
@@ -217,14 +175,19 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
         </div>
       </div>
     </div>
+    <div class="card" style="margin-bottom:14px">
+      <h3>Backpack</h3>
+      <p id="packNote" class="pack-note"></p>
+      <div id="pack"></div>
+    </div>
     <div class="card how">
       <h3>How to play</h3>
       <ul>
-        <li><b>Explore:</b> walk with the arrow keys, W A S D, or the pad on a touch screen. Walk into signs, people and chests to use them.</li>
-        <li><b>Puzzles are in the world:</b> hop across stones that add up to the sign's number, open the door that follows the rule, pay the troll the right toll, answer the elder to unlock a key.</li>
-        <li><b>Battles:</b> a monster tells you its HP once. Pick your moves and keep the running total in your head. Land on exactly 0 for double loot; overshoot and the loot scatters.</li>
-        <li><b>Beat the boss</b> behind the two-key door to clear a region and open the next one on the map.</li>
-        <li><b>Outfitter:</b> spend what you earn on useful gear (bigger moves, shields, charms, boots), outfits, a pet, and pet things that help on the road.</li>
+        <li><b>Move:</b> arrow keys or W A S D, or the pad on a touch screen. <b>Melee:</b> Z, J or Space (button A). <b>Ranged:</b> X or K (button B), it uses ammo that refills slowly and drops from monsters. <b>Q / E</b> or the swap buttons change weapons.</li>
+        <li><b>Weapons are numbers.</b> Plain monsters just take the damage. A <b>Number Slime</b> loses your weapon's number each hit and pops on exactly 0. A <b>Factor Beetle</b> only takes hits from a number that divides it, and shrinks by that much.</li>
+        <li><b>Puzzle rooms:</b> read the sign, then do it in the room: hop the stones that fit, shoot the right targets, push blocks onto plates, step on the right tiles, light the torches in order, hit the dials to the code. Each solved room unlocks its chest.</li>
+        <li><b>Keys:</b> two puzzle rooms and the arena hold keys. Three keys open the boss door.</li>
+        <li><b>Bosses</b> are beaten with the math: break the shield on exactly 0, divide the Factor Boss down to 1, feed the Minion Boss only the right minions, or stand on the next number in the Pattern Boss's sequence. Bosses drop special weapons, monsters drop coins, hearts, ammo and gear.</li>
       </ul>
     </div>
   </section>
@@ -239,25 +202,6 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
     <p id="mapHint" class="map-hint">Tap a region to enter it. Beat its boss to open the next one.</p>
   </section>
 
-  <section id="store" class="screen" hidden>
-    <div class="topbar2">
-      <button id="storeBack" class="btn btn-ghost btn-sm" type="button">Camp</button>
-      <div class="brand">Outfitter</div>
-      <div class="stats"><span class="stat" id="storeCoins"></span></div>
-    </div>
-    <div class="card">
-      <div class="store-head">
-        <div class="hero-wrap"><div id="storeHero" class="axo-box"></div><div id="storePet" class="pet-box"></div></div>
-        <div id="storeTabs" class="store-tabs" role="tablist">
-          <button class="st-tab on" type="button" data-tab="gear" role="tab">Gear</button>
-          <button class="st-tab" type="button" data-tab="outfits" role="tab">Outfits</button>
-          <button class="st-tab" type="button" data-tab="pets" role="tab">Pets</button>
-        </div>
-      </div>
-      <div id="storeGrid" class="store-grid"></div>
-    </div>
-  </section>
-
   <section id="chars" class="screen" hidden>
     <div class="topbar2">
       <button id="charsBack" class="btn btn-ghost btn-sm" type="button">Camp</button>
@@ -269,39 +213,45 @@ h1,h2,h3,.brand,.stat,.btn,.bubble,.axo-name,.brand-big,.pc-name,.lv-title,.ch-n
   <section id="game" class="screen" hidden>
     <div id="stage" class="stage">
       <canvas id="cv"></canvas>
-      <div id="petEl" class="stage-pet"></div>
-      <div id="heroEl" class="axo-box stage-hero"></div>
       <div class="hud">
         <div class="hud-l"><span class="hud-chip"><span id="hudHearts" class="hearts"></span></span><span id="hudRoom" class="hud-chip"></span></div>
-        <div class="hud-r"><span id="hudCoins" class="hud-chip"></span><span id="hudKeys" class="hud-chip"></span><button id="pauseBtn" class="icon-btn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button></div>
+        <div class="hud-r"><span id="hudM" class="hud-chip"></span><span id="hudR" class="hud-chip"></span><span id="hudBlock" class="hud-chip" hidden></span><span id="hudAmmo" class="hud-chip"></span><span id="hudCoins" class="hud-chip"></span><span id="hudKeys" class="hud-chip"></span><button id="pauseBtn" class="icon-btn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button></div>
       </div>
       <div id="banner" class="banner"></div>
       <div id="overlay" hidden></div>
     </div>
-    <div id="dpad" class="dpad">
-      <button class="dp dp-u" type="button" data-d="up" aria-label="Up">▲</button>
-      <button class="dp dp-l" type="button" data-d="left" aria-label="Left">◀</button>
-      <button class="dp dp-r" type="button" data-d="right" aria-label="Right">▶</button>
-      <button class="dp dp-d" type="button" data-d="down" aria-label="Down">▼</button>
+    <div class="controls">
+      <div id="dpad" class="dpad">
+        <button class="dp dp-u" type="button" data-d="up" aria-label="Up">▲</button>
+        <button class="dp dp-l" type="button" data-d="left" aria-label="Left">◀</button>
+        <button class="dp dp-r" type="button" data-d="right" aria-label="Right">▶</button>
+        <button class="dp dp-d" type="button" data-d="down" aria-label="Down">▼</button>
+      </div>
+      <div class="abtns">
+        <button id="btnQ" class="ab ab-q" type="button" aria-label="Swap melee weapon">swap<small>melee</small></button>
+        <button id="btnE" class="ab ab-e" type="button" aria-label="Swap ranged weapon">swap<small>ranged</small></button>
+        <button id="btnA" class="ab ab-a" type="button" aria-label="Melee attack">A<small>melee</small></button>
+        <button id="btnB" class="ab ab-b" type="button" aria-label="Ranged attack">B<small>ranged</small></button>
+      </div>
     </div>
-    <p class="hint" id="gameHint">Arrow keys or W A S D to walk · walk into things to use them · Esc to pause</p>
+    <p class="hint" id="gameHint">Arrows or W A S D to walk · Z melee · X ranged · Q/E swap weapons · Esc to pause</p>
   </section>
 
   <section id="clear" class="screen" hidden>
     <div class="card res">
-      <div class="hero-wrap"><div id="clearHero" class="axo-box"></div><div id="clearPet" class="pet-box"></div></div>
+      <div class="hero-wrap"><div id="clearHero" class="axo-box"></div></div>
       <h2 id="clearTitle" class="res-title">Region cleared!</h2>
       <p id="clearSub" class="res-sub"></p>
       <div class="stats4">
         <div class="sbox"><b id="cCoins">0</b><span id="cCoinsL">Coins</span></div>
         <div class="sbox"><b id="cXp">0</b><span>XP</span></div>
-        <div class="sbox"><b id="cBattles">0</b><span>Battles won</span></div>
-        <div class="sbox"><b id="cPerfect">0</b><span>Exact finishes</span></div>
+        <div class="sbox"><b id="cKills">0</b><span>Monsters</span></div>
+        <div class="sbox"><b id="cSolved">0</b><span>Puzzles</span></div>
       </div>
       <div id="clearNote" class="res-sub"></div>
       <div class="row" style="justify-content:center;margin-top:8px">
         <button id="clearMap" class="btn btn-big" type="button">World Map</button>
-        <button id="clearStore" class="btn btn-sky btn-big" type="button">Outfitter</button>
+        <button id="clearHub" class="btn btn-sky btn-big" type="button">Camp</button>
       </div>
     </div>
   </section>
