@@ -74,6 +74,15 @@ const rec0 = () => ({ coins: 100, xp: 60, clears: {}, inv: { melee: ['m2'], rang
   g = await G(p); check(g.ammo === ammo0 - 1, 'a ranged shot costs ammo');
   const hpAfter = await ev(p, () => { const e = window.__mq.Game.enemies()[0]; return e ? e.hp : -1; });
   check(hpAfter === -1 || hpAfter === e2.hp - 3, 'the shot hits for the ranged number (' + e2.hp + ' -> ' + hpAfter + ')');
+  /* the backpack: I opens it, a tap swaps the weapon, Escape closes it */
+  await ev(p, () => { const r = window.__mq.REC(); r.inv.melee.push('m4'); });
+  await p.keyboard.press('i'); await wait(200);
+  check(await ev(p, () => !document.querySelector('#overlay').hidden && document.querySelector('.ov-title').textContent === 'Backpack' && document.querySelectorAll('.inv-it').length >= 3), 'I opens the backpack with the weapons in it');
+  await ev(p, () => document.querySelector('.inv-it[data-eq="melee:m4"]').click()); await wait(150);
+  g = await G(p); check(g.M === 4 && await ev(p, () => document.querySelector('.inv-it[data-eq="melee:m4"]').classList.contains('on')), 'tapping a weapon equips it (melee is 4 now)');
+  await p.keyboard.press('Escape'); await wait(150);
+  check(await ev(p, () => document.querySelector('#overlay').hidden), 'Escape closes the backpack');
+  check(await ev(p, () => document.querySelectorAll('#btnQ, #btnE').length) === 0, 'there are only two attack buttons');
 
   /* 3. every puzzle kind, over several regions of the test player */
   await p.close();

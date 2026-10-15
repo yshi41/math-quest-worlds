@@ -145,7 +145,7 @@ const MQMath=(function(){
       if(opts.some(x=>x.value===o.value))continue;opts.push(o)}
     let best=0;opts.forEach((o,i)=>{if(o.value>opts[best].value)best=i});return {options:opts,best}}
   /* plain monster strength by tier */
-  function monsterHP(g,t,kind){const base=kind==='spiker'?4:kind==='shooter'?3:3;return base+Math.floor((t-1)/2)+(g===4?1:0)}
+  function monsterHP(g,t,kind){const base=kind==='spiker'?3:2;return base+Math.floor((t-1)/3)}
 
   return {rule,ruleNumbers,expr,stones,doors,targets,blocks,muncher,skipPath,torches,dials,numSlimes,beetles,bossShield,bossFactor,bossMinions,minionNumber,bossPattern,fork,monsterHP,_r:{ri,rint,pick,shuffle}};
 })();

@@ -81,12 +81,12 @@ const MQWorld=(function(){
     r=rooms.fork;const fk=M().fork(g,t,{cur}),fo=fk.options;const cx=fo.length===3?[3,8,12]:[4,11];
     fo.forEach((o,i)=>{put(r,cx[i],1,T.CAVE,{type:'cave',i,text:o.text,value:o.value});sign(r,cx[i]+1,2,`This cave holds ${o.text}.`)});r.fork=fk;
     /* hall, nest, arena, boss gate, boss */
-    r=rooms.hall;r.enemies.push({x:4,y:4,kind:'slime'},{x:11,y:4,kind:'slime'},{x:12,y:2,kind:t>=3?'spiker':'slime'});[[2,2],[13,2],[2,9],[13,9]].forEach(s=>set(r,s[0],s[1],T.TREE));
-    r=rooms.nest;r.enemies.push({x:4,y:3,kind:'slime'},{x:10,y:4,kind:'spiker'},{x:11,y:2,kind:t>=2?'shooter':'slime'},{x:5,y:8,kind:'slime'});chest(r,13,3,'gear',{locked:'enemies'});[[2,2],[7,5],[13,9]].forEach(s=>set(r,s[0],s[1],T.TREE));
+    r=rooms.hall;r.enemies.push({x:4,y:4,kind:'slime'},{x:11,y:4,kind:'slime'});if(t>=4)r.enemies.push({x:12,y:2,kind:'spiker'});[[2,2],[13,2],[2,9],[13,9]].forEach(s=>set(r,s[0],s[1],T.TREE));
+    r=rooms.nest;r.enemies.push({x:4,y:3,kind:'slime'},{x:10,y:4,kind:t>=2?'spiker':'slime'},{x:11,y:2,kind:t>=3?'shooter':'slime'});chest(r,13,3,'gear',{locked:'enemies'});[[2,2],[7,5],[13,9]].forEach(s=>set(r,s[0],s[1],T.TREE));
     r=rooms.arena;const beetleArena=t%2===0;const vals=beetleArena?M().beetles(g,t,ctx):M().numSlimes(g,t,ctx);
     vals.forEach((v,i)=>r.enemies.push({x:[4,8,11][i],y:[3,5,3][i],kind:beetleArena?'beetle':'numslime',n:v}));chest(r,13,3,'key',{locked:'enemies'});
     sign(r,2,8,beetleArena?'Factor Beetles! Only a weapon whose number divides a beetle\'s number can hurt it, and the number shrinks by that much each hit. At 1 it pops.':'Number Slimes! Each hit takes your weapon\'s number off a slime. Land on exactly 0 to pop it; go below and it bounces back.');
-    r=rooms.bossgate;r.openings.top.forEach(c=>put(r,c,0,T.BOSSDOOR,{type:'bossdoor'}));r.enemies.push({x:4,y:4,kind:'slime'},{x:11,y:4,kind:'shooter'});
+    r=rooms.bossgate;r.openings.top.forEach(c=>put(r,c,0,T.BOSSDOOR,{type:'bossdoor'}));r.enemies.push({x:4,y:4,kind:'slime'});if(t>=3)r.enemies.push({x:11,y:4,kind:'shooter'});
     r=rooms.boss;const bt=['shield','factor','minions','pattern'][(t-1)%4];r.bossType=bt;
     r.boss={kind:'boss',x:8,y:4,type:bt,data:bt==='shield'?M().bossShield(g,t,ctx):bt==='factor'?M().bossFactor(g,t,ctx):bt==='minions'?M().bossMinions(g,t):M().bossPattern(g,t)};
     if(bt==='pattern'){[[3,7],[5,7],[7,7],[9,7],[11,7],[13,7]].forEach((s,i)=>plate(r,s[0],s[1],'P',{i}))}

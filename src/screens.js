@@ -1,5 +1,5 @@
 /* ---------- screens: players, camp (with the backpack), world map, characters, region clear ---------- */
-const BUILD='2026-10-14.3';
+const BUILD='2026-10-14.4';
 let LAST_RUN={name:'',coins:0,xp:0,kills:0,solved:0,found:[]};
 function heroHTML(id,mood){const k=charWorld(id||player),c=charIdOf(id||player);return heroSVG(k,c,mood||'neutral')}
 

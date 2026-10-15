@@ -48,7 +48,7 @@ for (const g of [3, 4]) for (let t = 1; t <= 8; t++) {
     const bm = M.bossMinions(g, t); let okc = 0; for (let j = 0; j < 40; j++) if (bm.rule.test(M.minionNumber(bm.rule))) okc++; check(okc >= 4 && okc <= 36, 'minion boss: both kinds of minion appear (' + okc + '/40)');
     const bp = M.bossPattern(g, t); check(bp.rounds.length === 4 && bp.rounds.every(r => r.opts.length === 6 && r.opts.includes(r.answer) && new Set(r.opts).size === 6), 'pattern boss: four rounds of six plates');
     const f = M.fork(g, t, {}); check(f.options.length >= 2 && f.options.every((o, j) => o.value <= f.options[f.best].value), 'fork: best is the biggest');
-    check(M.monsterHP(g, t, 'slime') >= 3, 'monster hp');
+    check(M.monsterHP(g, t, 'slime') >= 2 && M.monsterHP(g, t, 'slime') <= 5, 'monster hp stays small (' + M.monsterHP(g, t, 'slime') + ')');
   }
   for (let i = 0; i < 16; i++) {
     const keyName = ['lagoon', 'candy', 'canopy', 'ocean', 'bows', 'boba', 'birds', 'cheer'][i % 8];

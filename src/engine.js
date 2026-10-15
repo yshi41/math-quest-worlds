@@ -5,7 +5,8 @@ const Game=(()=>{
   let G=null,T=40,raf=null,last=0,keys={},held={},bumpLock=null,lastTile=null;
   const HW=.36,HH=.3,SPD=4.6;
   const WALK=new Set([TT.FLOOR,TT.PATH,TT.STONE,TT.BRIDGE,TT.DECOR,TT.OPEN,TT.PLATE,TT.NUMTILE,TT.ISLAND,TT.RESET]);
-  const KIND={slime:{r:.4,spd:1.4,col:'#8BD16B',dmg:1},spiker:{r:.4,spd:2.3,col:'#E86A5A',dmg:1},shooter:{r:.4,spd:1.2,col:'#7B4BD6',dmg:1},numslime:{r:.46,spd:.9,col:'#F2C94C',dmg:1},beetle:{r:.44,spd:1.0,col:'#5A8FBF',dmg:1},troggle:{r:.34,spd:2.7,col:'#C2552B',dmg:1},minion:{r:.34,spd:1.3,col:'#B48CF0',dmg:1}};
+  /* gentle monsters: slow enough to walk away from, and few enough per room (Yan, 10/14: the combat was too hard) */
+  const KIND={slime:{r:.4,spd:1.0,col:'#8BD16B',dmg:1},spiker:{r:.4,spd:1.7,col:'#E86A5A',dmg:1},shooter:{r:.4,spd:.9,col:'#7B4BD6',dmg:1},numslime:{r:.46,spd:.7,col:'#F2C94C',dmg:1},beetle:{r:.44,spd:.8,col:'#5A8FBF',dmg:1},troggle:{r:.34,spd:1.9,col:'#C2552B',dmg:1},minion:{r:.34,spd:1.0,col:'#B48CF0',dmg:1}};
 
   const rec=()=>REC();
   const tileAt=(x,y)=>(x<0||y<0||x>=RW||y>=RH)?TT.WALL:G.room.grid[Math.floor(y)*RW+Math.floor(x)];
@@ -19,7 +20,7 @@ const Game=(()=>{
   function start(k){Snd.init();const r=rec(),g=kid(player).grade,t=tierOf(k,player),st=heroStats(r,charWorld(),charIdOf());
     const region=Wd.makeRegion(k,g,t,{cur:curName(k),name:RNAME[k],M:st.M,R:st.R,divs:st.divs,secretItem:SECRET_LOOT[k]});
     G={key:k,g,t,region,room:null,hero:{x:region.start.x,y:region.start.y,dir:'up',walkT:0,moving:false,inv:0,swing:0,cd:0,rcd:0,pushCd:0,kb:null},enemies:[],shots:[],eshots:[],drops:[],fx:[],floats:[],
-      keys:0,hearts:st.maxHearts,maxHearts:st.maxHearts,st,ammo:8,ammoMax:8,ammoT:0,flags:{fork:false,missLeft:st.miss,guard:st.guard},coins:0,xp:0,kills:0,solved:0,found:[],time:0,paused:false,trans:null,dead:{},boss:null,cleared:false};
+      keys:0,hearts:st.maxHearts,maxHearts:st.maxHearts,st,ammo:12,ammoMax:12,ammoT:0,flags:{fork:false,missLeft:st.miss,guard:st.guard},coins:0,xp:0,kills:0,solved:0,found:[],time:0,paused:false,trans:null,dead:{},boss:null,cleared:false};
     applyWorld(k,1+clearsOf(r));
     enterRoom(region.byTag.entrance.rx,2,null);
     show('game');$('#pageScene').hidden=true;resize();renderHUD();Snd.startMusic('calm');
@@ -38,14 +39,14 @@ const Game=(()=>{
     if(prev&&from)G.trans={dir:from,t:0,prev};
     renderHUD()}
   function spawn(kind,x,y,o){o=o||{};const d=KIND[kind]||KIND.slime;const hp=kind==='troggle'?2:kind==='minion'?1:MQMath.monsterHP(G.g,G.t,kind);
-    return Object.assign({kind,x,y,r:d.r,spd:d.spd,col:d.col,dmg:d.dmg+(G.t>=5?1:0),hp,hpMax:hp,n:o.n!=null?o.n:null,n0:o.n!=null?o.n:null,hurt:0,wt:0,dx:0,dy:0,cd:rand(1,2.4),life:kind==='troggle'?16:kind==='minion'?14:Infinity,ok:o.ok,key:o.key||null,fx:1,fy:0},o)}
+    return Object.assign({kind,x,y,r:d.r,spd:d.spd,col:d.col,dmg:d.dmg+(G.t>=6?1:0),hp,hpMax:hp,n:o.n!=null?o.n:null,n0:o.n!=null?o.n:null,hurt:0,wt:0,dx:0,dy:0,cd:rand(1.5,3),life:kind==='troggle'?12:kind==='minion'?14:Infinity,ok:o.ok,key:o.key||null,fx:1,fy:0},o)}
 
   /* ---------- the loop ---------- */
   function loop(now){raf=requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;if(!G)return;G.time+=dt;
     if(!G.paused&&!Ov.isOpen()){if(G.trans){G.trans.t+=dt/.38;if(G.trans.t>=1)G.trans=null}else update(dt)}
     render()}
   function update(dt){const h=G.hero;h.inv=Math.max(0,h.inv-dt);h.cd=Math.max(0,h.cd-dt);h.rcd=Math.max(0,h.rcd-dt);h.swing=Math.max(0,h.swing-dt);h.pushCd=Math.max(0,h.pushCd-dt);
-    if(G.ammo<G.ammoMax){G.ammoT+=dt;if(G.ammoT>=3){G.ammoT=0;G.ammo++;renderHUD()}}
+    if(G.ammo<G.ammoMax){G.ammoT+=dt;if(G.ammoT>=2){G.ammoT=0;G.ammo++;renderHUD()}}
     moveHero(dt);updateShots(dt);updateEnemies(dt);updateDrops(dt);
     if(G.boss)Boss.update(G.boss,dt);
     G.fx.forEach(f=>{f.life-=dt;f.x+=f.vx*dt;f.y+=f.vy*dt});G.fx=G.fx.filter(f=>f.life>0);G.floats.forEach(f=>{f.life-=dt});G.floats=G.floats.filter(f=>f.life>0)}
@@ -74,11 +75,11 @@ const Game=(()=>{
     enterRoom(rx,ry,dir);if(dx<0)h.x=RW-.7;if(dx>0)h.x=.7;if(dy<0)h.y=RH-.7;if(dy>0)h.y=.7;lastTile=null;bumpLock=null}
 
   /* ---------- attacks ---------- */
-  function melee(){const h=G.hero;if(!G||G.trans||Ov.isOpen()||h.cd>0)return;h.cd=.38;h.swing=.25;Snd.swish();const [dx,dy]=DIR[h.dir],cxp=h.x+dx*.85,cyp=h.y+dy*.85,v=G.st.M;
-    let any=false;for(const e of G.enemies.slice()){if(Math.hypot(e.x-cxp,e.y-cyp)<e.r+.55){hitEnemy(e,v,'melee');any=true}}
+  function melee(){const h=G.hero;if(!G||G.trans||Ov.isOpen()||h.cd>0)return;h.cd=.3;h.swing=.25;Snd.swish();const [dx,dy]=DIR[h.dir],cxp=h.x+dx*.9,cyp=h.y+dy*.9,v=G.st.M;
+    let any=false;for(const e of G.enemies.slice()){if(Math.hypot(e.x-cxp,e.y-cyp)<e.r+.75){hitEnemy(e,v,'melee');any=true}}
     const o=objAt(cxp,cyp);if(o&&o.type==='dial')Puz.onMelee(o);
     if(!any)G.fx.push({x:cxp,y:cyp,vx:0,vy:0,r:.1,col:G.st.theme.col,life:.15})}
-  function ranged(){const h=G.hero;if(!G||G.trans||Ov.isOpen()||h.rcd>0)return;if(G.ammo<=0){float('no ammo',h.x,h.y-1,'#E86A5A');Snd.tick();return}h.rcd=.3;G.ammo--;renderHUD();Snd.shoot();const [dx,dy]=DIR[h.dir];
+  function ranged(){const h=G.hero;if(!G||G.trans||Ov.isOpen()||h.rcd>0)return;if(G.ammo<=0){float('no ammo',h.x,h.y-1,'#E86A5A');Snd.tick();return}h.rcd=.25;G.ammo--;renderHUD();Snd.shoot();const [dx,dy]=DIR[h.dir];
     G.shots.push({x:h.x+dx*.5,y:h.y-.15+dy*.5,vx:dx*9,vy:dy*9,v:G.st.R,life:1.5,shape:G.st.theme.shape,col:G.st.theme.col,showV:true})}
   function updateShots(dt){const h=G.hero;
     for(const s of G.shots){s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;if(s.life<=0)continue;
@@ -90,16 +91,16 @@ const Game=(()=>{
     G.eshots=G.eshots.filter(s=>s.life>0)}
   function hitEnemy(e,v,kind){const h=G.hero;e.hurt=.3;
     if(e.kind==='boss'){Boss.hit(e,v,kind);return}
-    if(e.kind==='numslime'){e.n-=v;if(e.n===0){float('exactly 0!',e.x,e.y-1,'#1F9C72');die(e,{double:true})}else if(e.n<0){float('too much! back to '+e.n0,e.x,e.y-1,'#E86A5A');e.n=e.n0;Snd.wrong();knock(h,h.x-e.x,h.y-e.y,.3);e.x+=0}else{float('−'+v,e.x,e.y-1);Snd.hit();knock(e,e.x-h.x,e.y-h.y,.15)}return}
-    if(e.kind==='beetle'){if(e.n%v===0){e.n/=v;float('÷'+v,e.x,e.y-1,'#1F9C72');Snd.hit();if(e.n===1){die(e,{double:true})}else knock(e,e.x-h.x,e.y-h.y,.15)}else{float(v+' doesn\'t go into '+e.n,e.x,e.y-1,'#E86A5A');Snd.wrong();knock(h,h.x-e.x,h.y-e.y,.3)}return}
-    e.hp-=v;Snd.hit();knock(e,e.x-h.x,e.y-h.y,.18);float('−'+v,e.x,e.y-1);if(e.hp<=0)die(e)}
+    if(e.kind==='numslime'){e.n-=v;if(e.n===0){float('exactly 0!',e.x,e.y-1,'#1F9C72');die(e,{double:true})}else if(e.n<0){float('too much! back to '+e.n0,e.x,e.y-1,'#E86A5A');e.n=e.n0;Snd.wrong();knock(e,e.x-h.x,e.y-h.y,.3)}else{float('−'+v,e.x,e.y-1);Snd.hit();knock(e,e.x-h.x,e.y-h.y,.25)}return}
+    if(e.kind==='beetle'){if(e.n%v===0){e.n/=v;float('÷'+v,e.x,e.y-1,'#1F9C72');Snd.hit();if(e.n===1){die(e,{double:true})}else knock(e,e.x-h.x,e.y-h.y,.25)}else{float(v+' doesn\'t go into '+e.n,e.x,e.y-1,'#E86A5A');Snd.wrong();knock(e,e.x-h.x,e.y-h.y,.3)}return}
+    e.hp-=v;Snd.hit();knock(e,e.x-h.x,e.y-h.y,.28);float('−'+v,e.x,e.y-1);if(e.hp<=0)die(e)}
   function knock(who,dx,dy,t){const d=Math.hypot(dx,dy)||1;who.kb={x:dx/d*7,y:dy/d*7,t:t||.2}}
   function die(e,o){o=o||{};G.enemies=G.enemies.filter(x=>x!==e);if(e.key)G.dead[e.key]=true;const r=rec();r.kills=(r.kills|0)+1;G.kills++;
     popFx(e.x,e.y,e.col);Snd.pop(o.double?4:2);
     const st=G.st;let coins=1+ri(3)+(o.double?4+G.t:0);if(e.kind==='minion')coins=0;
     if(coins)drop(e.x,e.y,'coin',coins);
-    if(Math.random()<(st.snack?.24:.12))drop(e.x+.3,e.y,'heart',1);
-    if(Math.random()<.4)drop(e.x-.3,e.y+.2,'ammo',3);
+    if(Math.random()<(st.snack?.34:.18))drop(e.x+.3,e.y,'heart',1);
+    if(Math.random()<.45)drop(e.x-.3,e.y+.2,'ammo',4);
     if(e.kind!=='troggle'&&e.kind!=='minion'&&Math.random()<(o.double?.12:.03)){const id=unownedItem();if(id)drop(e.x,e.y-.3,'gear',id)}
     addXp(e.kind==='troggle'?1:o.double?6:3,true);
     Puz.onEnemyDied(e)}
@@ -117,7 +118,7 @@ const Game=(()=>{
   function foundItem(id){const r=rec(),it=ITEM_BY_ID[id];if(!it)return;const isNew=giveItem(r,id);G.found.push(id);Snd.unlock();FX.burst(innerWidth/2,innerHeight*.4,50);
     if(it.kind==='heart'){G.maxHearts=r.hearts;G.hearts=G.maxHearts;Ov.item(it,'A Heart Container! Your hearts grow to '+r.hearts+'.')}
     else if(!isNew)Ov.item(it,'You already carry one of these, so it turns into coins.',()=>addCoins(30));
-    else Ov.item(it,it.kind==='armor'?'Armour blocks '+it.block+' from every hit. It is on now.':(it.kind==='melee'?'A melee weapon with the number '+it.v+'. Press Q or the swap button to cycle melee weapons.':'A ranged weapon with the number '+it.v+'. Press E or the swap button to cycle ranged weapons.'),()=>{if(it.kind==='armor')r.equip.armor=id;else r.equip[it.kind]=id;refreshStats()});
+    else Ov.item(it,it.kind==='armor'?'Armour blocks '+it.block+' from every hit. It is on now.':(it.kind==='melee'?'A melee weapon with the number '+it.v+'. It is in your hand now; open the backpack (I or the bag button) to swap.':'A ranged weapon with the number '+it.v+'. It is loaded now; open the backpack (I or the bag button) to swap.'),()=>{if(it.kind==='armor')r.equip.armor=id;else r.equip[it.kind]=id;refreshStats()});
     persist()}
   function refreshStats(){const r=rec(),st=heroStats(r,charWorld(),charIdOf());G.st=st;G.maxHearts=st.maxHearts;G.hearts=Math.min(G.hearts,G.maxHearts);renderHUD()}
   function cycle(kind){const r=rec(),list=r.inv[kind].slice().sort((a,b)=>ITEM_BY_ID[a].v-ITEM_BY_ID[b].v);if(list.length<2){float('only one '+kind+' weapon',G.hero.x,G.hero.y-1);return}
@@ -133,13 +134,13 @@ const Game=(()=>{
       if(e.kind==='spiker'){if(!e.dx&&!e.dy){const a=rand(0,TAU);e.dx=Math.cos(a);e.dy=Math.sin(a)}vx=e.dx*e.spd;vy=e.dy*e.spd;
         if(enemyBlocked(e,e.x+vx*dt,e.y)){e.dx=-e.dx;vx=-vx}if(enemyBlocked(e,e.x,e.y+vy*dt)){e.dy=-e.dy;vy=-vy}}
       else if(e.kind==='shooter'){e.fx=dx/(d||1);e.fy=dy/(d||1);if(d<3){vx=-dx/d*e.spd;vy=-dy/d*e.spd}else if(d>5.5){vx=dx/d*e.spd;vy=dy/d*e.spd}else{e.wt-=dt;if(e.wt<=0){e.wt=rand(.6,1.4);const a=rand(0,TAU);e.dx=Math.cos(a)*.7;e.dy=Math.sin(a)*.7}vx=e.dx;vy=e.dy}
-        e.cd-=dt;if(e.cd<=0&&d<7){e.cd=2.2;G.eshots.push({x:e.x,y:e.y,vx:dx/d*4.5,vy:dy/d*4.5,life:3,dmg:e.dmg,col:e.col});Snd.tick()}}
+        e.cd-=dt;if(e.cd<=0&&d<7){e.cd=2.8;G.eshots.push({x:e.x,y:e.y,vx:dx/d*3.4,vy:dy/d*3.4,life:3,dmg:e.dmg,col:e.col});Snd.tick()}}
       else{const chase=e.kind==='troggle'?12:e.kind==='minion'?9:6;if(d<chase&&d>.1){vx=dx/d*e.spd;vy=dy/d*e.spd}else{e.wt-=dt;if(e.wt<=0){e.wt=rand(.8,2);const a=rand(0,TAU);e.dx=Math.cos(a)*.5;e.dy=Math.sin(a)*.5;if(Math.random()<.3){e.dx=0;e.dy=0}}vx=e.dx;vy=e.dy}}
       const nx=e.x+vx*dt,ny=e.y+vy*dt;if(!enemyBlocked(e,nx,e.y))e.x=nx;else e.wt=0;if(!enemyBlocked(e,e.x,ny))e.y=ny;else e.wt=0;
       e.x=clamp(e.x,1+e.r,RW-1-e.r);e.y=clamp(e.y,1+e.r,RH-1-e.r);
       if(h.inv<=0&&d<e.r+.42)contact(e)}}
   function contact(e){const h=G.hero;if(G.flags.guardLeft>0){G.flags.guardLeft--;float('pet blocks it!',h.x,h.y-1,'#1F9C72');h.inv=1;return}
-    const dmg=Math.max(0,e.dmg-G.st.block);knock(h,h.x-e.x,h.y-e.y,.22);h.inv=1;if(dmg>0)hurt(dmg,e);else{float('blocked',h.x,h.y-1,'#3B66E6');Snd.tick()}}
+    const dmg=Math.max(0,e.dmg-G.st.block);knock(h,h.x-e.x,h.y-e.y,.22);knock(e,e.x-h.x,e.y-h.y,.3);h.inv=1.4;if(dmg>0)hurt(dmg,e);else{float('blocked',h.x,h.y-1,'#3B66E6');Snd.tick()}}
   function hurt(n,why){if(n<=0)return false;G.hearts=Math.max(0,G.hearts-n);Snd.hurt();G.hero.shake=.4;renderHUD();if(G.hearts<=0){faint();return true}return false}
   function faint(){Snd.lose();const h=G.hero;Ov.message('You fainted! Your friends carry you back to the entrance. The monsters are back, but what you solved stays solved.',{title:'Oh no',onClose:()=>{G.dead={};G.hearts=G.maxHearts;G.boss=null;enterRoom(G.region.byTag.entrance.rx,2,null);h.x=G.region.start.x;h.y=G.region.start.y;lastTile=null;renderHUD()}})}
   function addCoins(n){if(n<=0)return;const r=rec();r.coins+=n;G.coins+=n;Snd.coin();float('+'+n,G.hero.x,G.hero.y-1,'#FFE24A');renderHUD()}
@@ -224,7 +225,7 @@ const Game=(()=>{
 
   /* ---------- bosses: the math is in how you hit them ---------- */
   const Boss={
-    make(rm){const b=rm.boss,col=BOSS_COL[G.key]||'#D9453A';const e={kind:'boss',x:b.x+.5,y:b.y+.5,r:.95,spd:.9,col,dmg:2+(G.t>=5?1:0),hurt:0,wt:0,dx:0,dy:0,cd:2,type:b.type,data:b.data,phase:0,n:null,tag:'',stun:0,hp:0,need:0,life:Infinity,key:'boss',name:BOSS_NAMES[G.key]};
+    make(rm){const b=rm.boss,col=BOSS_COL[G.key]||'#D9453A';const e={kind:'boss',x:b.x+.5,y:b.y+.5,r:.95,spd:.65,col,dmg:1+(G.t>=5?1:0),hurt:0,wt:0,dx:0,dy:0,cd:2,type:b.type,data:b.data,phase:0,n:null,tag:'',stun:0,hp:0,need:0,life:Infinity,key:'boss',name:BOSS_NAMES[G.key]};
       if(b.type==='shield'){e.n=b.data.phases[0];e.tag='Shield: hit exactly 0'}
       else if(b.type==='factor'){e.n=b.data.phases[0];e.tag='Only divisors hurt it'}
       else if(b.type==='minions'){e.need=b.data.need;e.hp=0;e.tag=b.data.label;e.n=e.need}
@@ -234,8 +235,8 @@ const Game=(()=>{
     setPlates(e){const r=e.data.rounds[e.round],rm=G.room;(rm.plates||[]).forEach((pl,i)=>{pl.n=r.opts[i];pl.on=false})},
     hit(e,v,kind){const h=G.hero;
       if(e.type==='shield'){if(e.stun>0){this.phaseUp(e);return}e.n-=v;if(e.n===0){e.stun=4;e.tag='Shield down! Hit it!';float('exactly 0!',e.x,e.y-1.3,'#1F9C72');Snd.special?Snd.special():Snd.glow()}
-        else if(e.n<0){e.n=e.data.phases[e.phase];float('too much! shield back to '+e.n,e.x,e.y-1.3,'#E86A5A');Snd.wrong();knock(h,h.x-e.x,h.y-e.y,.35);hurt(Math.max(0,1-G.st.block),e)}else{float('−'+v,e.x,e.y-1.3);Snd.hit()}return}
-      if(e.type==='factor'){if(e.n%v===0){e.n/=v;float('÷'+v,e.x,e.y-1.3,'#1F9C72');Snd.hit();if(e.n===1)this.phaseUp(e)}else{float(v+' doesn\'t go into '+e.n,e.x,e.y-1.3,'#E86A5A');Snd.wrong();knock(h,h.x-e.x,h.y-e.y,.3);if(G.enemies.length<4&&Math.random()<.5)G.enemies.push(spawn('beetle',e.x+rand(-1,1),e.y+1.5,{n:pickOne(e.data.divs)*pickOne(e.data.divs)}))}return}
+        else if(e.n<0){e.n=e.data.phases[e.phase];float('too much! shield back to '+e.n,e.x,e.y-1.3,'#E86A5A');Snd.wrong();knock(e,e.x-h.x,e.y-h.y,.3)}else{float('−'+v,e.x,e.y-1.3);Snd.hit()}return}
+      if(e.type==='factor'){if(e.n%v===0){e.n/=v;float('÷'+v,e.x,e.y-1.3,'#1F9C72');Snd.hit();if(e.n===1)this.phaseUp(e)}else{float(v+' doesn\'t go into '+e.n,e.x,e.y-1.3,'#E86A5A');Snd.wrong();knock(e,e.x-h.x,e.y-h.y,.3);if(G.enemies.length<3&&Math.random()<.35)G.enemies.push(spawn('beetle',e.x+rand(-1,1),e.y+1.5,{n:pickOne(e.data.divs)*pickOne(e.data.divs)}))}return}
       if(e.type==='minions'){float('only its minions can hurt it',e.x,e.y-1.3,'#E86A5A');Snd.tick();return}
       float('stand on the next number!',e.x,e.y-1.3,'#E86A5A');Snd.tick()},
     phaseUp(e){e.phase++;Snd.bossHit();popFx(e.x,e.y,e.col);knock(e,e.x-G.hero.x,e.y-G.hero.y,.3);
@@ -247,7 +248,7 @@ const Game=(()=>{
     update(e,dt){const h=G.hero;e.hurt=Math.max(0,e.hurt-dt);
       if(e.stun>0){e.stun-=dt;if(e.stun<=0){e.stun=0;e.n=e.data.phases[e.phase];e.tag='Shield: hit exactly 0';float('the shield is back',e.x,e.y-1.3)}return}
       if(e.kb){e.x+=e.kb.x*dt;e.y+=e.kb.y*dt;e.kb.t-=dt;if(e.kb.t<=0)e.kb=null}
-      else{const dx=h.x-e.x,dy=h.y-e.y,d=Math.hypot(dx,dy)||1;const spd=e.type==='pattern'?.6:e.spd;if(d>1.2){const nx=e.x+dx/d*spd*dt,ny=e.y+dy/d*spd*dt;if(!enemyBlocked(e,nx,e.y))e.x=nx;if(!enemyBlocked(e,e.x,ny))e.y=ny}
+      else{const dx=h.x-e.x,dy=h.y-e.y,d=Math.hypot(dx,dy)||1;const spd=e.type==='pattern'?.45:e.spd;if(d>1.2){const nx=e.x+dx/d*spd*dt,ny=e.y+dy/d*spd*dt;if(!enemyBlocked(e,nx,e.y))e.x=nx;if(!enemyBlocked(e,e.x,ny))e.y=ny}
         if(h.inv<=0&&d<e.r+.42)contact(e)}
       e.x=clamp(e.x,1.2,RW-1.2);e.y=clamp(e.y,1.2,RH-1.2);
       if(e.type==='minions'){e.cd-=dt;if(e.cd<=0&&G.enemies.filter(x=>x.kind==='minion').length<4){e.cd=2.4;const n=MQMath.minionNumber(e.data.rule);const m=spawn('minion',clamp(e.x+rand(-2,2),1.5,RW-1.5),clamp(e.y+rand(1,2),1.5,RH-1.5),{n,ok:e.data.rule.test(n)});G.enemies.push(m)}}
@@ -296,21 +297,22 @@ const Game=(()=>{
     $('#hudBlock').innerHTML=st.block?shieldSvg+' '+st.block:'';$('#hudBlock').hidden=!st.block;
     const names={entrance:'Entrance',hall:'Hall',pA:'Puzzle room',pB:'Puzzle room',pC:'Puzzle room',pD:'Puzzle room',pE:'Puzzle room',secret:'Secret room',arena:'Arena',nest:'Monster nest',bossgate:'Boss gate',boss:'Boss lair',fork:'Fork caves'};
     const rn=names[G.room.tag]||G.room.tag;$('#hudRoom').textContent=rn;
-    $('#gameHint').textContent=rn+' · '+(document.body.classList.contains('touch')?'pad to walk · A melee · B ranged · swap buttons change weapons':'arrows/WASD walk · Z or Space melee · X ranged · Q/E swap weapons · Esc pause')}
+    $('#gameHint').textContent=rn+' · '+(document.body.classList.contains('touch')?'pad to walk · A melee · B ranged · bag button swaps weapons':'arrows/WASD walk · Space melee · X ranged · I backpack · Esc pause')}
 
   /* ---------- input ---------- */
   addEventListener('keydown',e=>{if(screen!=='game')return;if(Ov.isOpen()){if(Ov.key(e))e.preventDefault();return}
     if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();
     if(e.key==='Escape'||e.key==='p'||e.key==='P'){Ov.pause();return}
-    if(!e.repeat){if(e.key==='z'||e.key==='Z'||e.key==='j'||e.key==='J'||e.key===' ')melee();else if(e.key==='x'||e.key==='X'||e.key==='k'||e.key==='K')ranged();else if(e.key==='q'||e.key==='Q')cycle('melee');else if(e.key==='e'||e.key==='E')cycle('ranged')}
+    if(!e.repeat){if(e.key==='z'||e.key==='Z'||e.key==='j'||e.key==='J'||e.key===' ')melee();else if(e.key==='x'||e.key==='X'||e.key==='k'||e.key==='K')ranged();else if(e.key==='i'||e.key==='I'||e.key==='Tab'){e.preventDefault();Ov.inventory();return}}
     keys[e.key]=true});
   addEventListener('keyup',e=>{keys[e.key]=false});
   addEventListener('blur',()=>{keys={};held={}});
   document.querySelectorAll('#dpad .dp').forEach(b=>{const d=b.getAttribute('data-d');const on=e=>{e.preventDefault();held[d]=true;b.classList.add('held');document.body.classList.add('touch');Snd.init()};const off=()=>{held[d]=false;b.classList.remove('held')};
     b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('pointerleave',off);b.addEventListener('contextmenu',e=>e.preventDefault())});
   const tb=(id,fn)=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();document.body.classList.add('touch');Snd.init();fn()});b.addEventListener('contextmenu',e=>e.preventDefault())};
-  tb('#btnA',melee);tb('#btnB',ranged);tb('#btnQ',()=>G&&cycle('melee'));tb('#btnE',()=>G&&cycle('ranged'));
+  tb('#btnA',melee);tb('#btnB',ranged);
   $('#pauseBtn').onclick=()=>{if(G&&!Ov.isOpen())Ov.pause()};
+  $('#bagBtn').onclick=()=>{if(G&&!Ov.isOpen())Ov.inventory()};
   addEventListener('resize',()=>{if(G)resize()});
   addEventListener('touchstart',()=>document.body.classList.add('touch'),{passive:true,once:true});
 
